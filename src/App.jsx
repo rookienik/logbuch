@@ -572,6 +572,23 @@ function OrthoTagPicker({ sp, tags, onToggle, search }) {
                 {sec.regions.map(reg => {
                   const isRegOpen = openReg === reg.id;
                   const regSel = reg.items.filter(i => tags.includes(i.id)).length;
+                  const singleItem = reg.items.length === 1;
+
+                  // Single item: skip accordion, render directly
+                  if (singleItem) {
+                    const item = reg.items[0];
+                    return (
+                      <div key={reg.id} style={{ marginBottom: 3 }}>
+                        <TagItem
+                          item={{ ...item, label: reg.label, note: reg.note }}
+                          selected={tags.includes(item.id)}
+                          onToggle={() => onToggle(item.id)}
+                          color={color}
+                        />
+                      </div>
+                    );
+                  }
+
                   return (
                     <div key={reg.id} style={{ marginBottom: 3 }}>
                       <button onClick={() => setOpenReg(isRegOpen ? null : reg.id)} style={{
@@ -1010,44 +1027,53 @@ function ProgressView({ cases }) {
                   const regTotal = regItems.reduce((s, i) => s + getCount(i, isRegional), 0);
                   const regMin = regItems.reduce((s, i) => s + (i.min || 0), 0);
                   const regDone = regMin > 0 && regTotal >= regMin;
+                  const singleItem = regItems.length === 1;
 
                   return (
-                    <div key={reg.id} style={{ marginBottom: 12 }}>
-                      {/* Region subheader */}
-                      <div style={{ marginBottom: 6 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: regMin > 0 ? 4 : 0 }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, color: regDone ? "#64748b" : "#475569" }}>
-                            {reg.label}
-                          </span>
-                          {regMin > 0 && (
-                            <span style={{ fontSize: 10, fontFamily: "ui-monospace, monospace", color: regDone ? "#22c55e" : DS.textDim, flexShrink: 0, marginLeft: 8 }}>
-                              {regTotal}/{regMin}
+                    <div key={reg.id} style={{ marginBottom: singleItem ? 10 : 14 }}>
+                      {/* Only show region subheader when there are multiple items */}
+                      {!singleItem && (
+                        <div style={{ marginBottom: 6 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: regMin > 0 ? 4 : 0 }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: regDone ? "#64748b" : "#475569" }}>
+                              {reg.label}
                             </span>
+                            {regMin > 0 && (
+                              <span style={{ fontSize: 10, fontFamily: "ui-monospace, monospace", color: regDone ? "#22c55e" : DS.textDim, flexShrink: 0, marginLeft: 8 }}>
+                                {regTotal}/{regMin}
+                              </span>
+                            )}
+                          </div>
+                          {reg.note && <div style={{ fontSize: 10, color: DS.textDim, marginBottom: 4 }}>{reg.note}</div>}
+                          {regMin > 0 && (
+                            <div style={{ height: 3, borderRadius: 2, background: DS.border2, overflow: "hidden" }}>
+                              <div style={{
+                                height: "100%", borderRadius: 2,
+                                width: `${Math.min(100, Math.round((regTotal / regMin) * 100))}%`,
+                                background: regDone ? "#22c55e" : sp.color + "70",
+                                transition: "width 0.3s"
+                              }} />
+                            </div>
                           )}
                         </div>
-                        {reg.note && <div style={{ fontSize: 10, color: DS.textDim, marginBottom: 4 }}>{reg.note}</div>}
-                        {regMin > 0 && (
-                          <div style={{ height: 3, borderRadius: 2, background: DS.border2, overflow: "hidden" }}>
-                            <div style={{
-                              height: "100%", borderRadius: 2,
-                              width: `${Math.min(100, Math.round((regTotal / regMin) * 100))}%`,
-                              background: regDone ? "#22c55e" : sp.color + "70",
-                              transition: "width 0.3s"
-                            }} />
-                          </div>
-                        )}
-                      </div>
+                      )}
 
                       {regItems.map(item => {
                         const cnt = getCount(item, isRegional);
                         const rawC = counts[item.id] || { V: 0, I: 0, A: 0 };
                         const done = item.min && cnt >= item.min;
+                        // When single item: use region note as subtitle, no indent
                         return (
-                          <div key={item.id} style={{ marginBottom: 8, paddingLeft: 8 }}>
+                          <div key={item.id} style={{ marginBottom: 8, paddingLeft: singleItem ? 0 : 8 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                              <span style={{ fontSize: 12, color: done ? DS.textMuted : "#94a3b8", flex: 1, lineHeight: 1.4 }}>
-                                {item.label}
-                              </span>
+                              <div style={{ flex: 1 }}>
+                                <span style={{ fontSize: 12, color: done ? DS.textMuted : "#94a3b8", lineHeight: 1.4 }}>
+                                  {singleItem ? reg.label : item.label}
+                                </span>
+                                {singleItem && reg.note && (
+                                  <div style={{ fontSize: 10, color: DS.textDim, marginTop: 2 }}>{reg.note}</div>
+                                )}
+                              </div>
                               <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
                                 {isRegional
                                   ? cnt > 0 && <span style={{ fontSize: 10, fontFamily: "ui-monospace, monospace", color: "#f59e0baa" }}>V:{cnt}</span>
