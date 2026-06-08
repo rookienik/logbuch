@@ -1,393 +1,179 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-// ─── SUPABASE CLIENT ──────────────────────────────────────────────────────────
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
-// ─── CATALOG DATA ─────────────────────────────────────────────────────────────
-
-// Chirurgie and Hand: flat sections → items (unchanged structure)
-// Ortho: sections → regions → items (3-level)
+// ─── CATALOG ──────────────────────────────────────────────────────────────────
 
 const CATALOG = {
   chirurgie: {
-    label: "Chirurgie",
-    color: "#60a5fa",
-    type: "flat",
+    label: "Chirurgie", color: "#60a5fa", type: "flat",
     sections: [
-      {
-        id: "notfall", label: "Notfallchirurgie", min: 85,
-        items: [
-          { id: "c_schockraum", label: "Schockraummanagement", min: 10 },
-          { id: "c_reposition", label: "Reposition Luxation/Frakturen, konservative Frakturbehandlung", min: 15 },
-          { id: "c_wunde", label: "Wundversorgungen", min: 30 },
-          { id: "c_fixateur", label: "Anlage Fixateur externe", min: 5 },
-          { id: "c_thorax", label: "Thoraxdrainagen", min: 15 },
-          { id: "c_zerviko", label: "Zervikotomien / Tracheafreilegung", min: 5 },
-          { id: "c_cystofix", label: "Cystofixeinlage", min: 5 },
-        ]
-      },
-      {
-        id: "allgemein", label: "Allgemeinchirurgie", min: 260,
-        items: [
-          { id: "c_laparotomie", label: "Laparotomie", min: 15 },
-          { id: "c_laparoskopie", label: "Laparoskopie (diagnostisch/Zugang)", min: 15 },
-          { id: "c_appendektomie", label: "Appendektomie", min: 30 },
-          { id: "c_cholezyst", label: "Cholezystektomie", min: 30 },
-          { id: "c_hernie", label: "Hernienoperationen (inguinal/umbilical)", min: 40 },
-          { id: "c_duenndarm", label: "Dünndarmeingriffe, Stoma", min: 20 },
-          { id: "c_prokto", label: "Proktologische Eingriffe", min: 20 },
-          { id: "c_klein", label: "Kleinchirurgische Eingriffe", min: 40 },
-          { id: "c_venen", label: "Veneneingriffe (Varizen, Port/Pacemaker)", min: 30 },
-          { id: "c_weitere", label: "Weitere (Thorax, Uro, Gefässe, Endoskopie, Mamma)", min: 20 },
-        ]
-      },
-      {
-        id: "viszeral", label: "Modul Viszeralchirurgie", min: 165, optional: true,
-        items: [
-          { id: "v_lap", label: "Laparoskopie / Laparotomie", min: 40 },
-          { id: "v_abdhern", label: "Abdominalhernien (Narbenhernien, videoskopisch)", min: 25 },
-          { id: "v_magen", label: "Mageneingriffe", min: 7 },
-          { id: "v_duenn", label: "Dünndarmeingriffe (Resektion, Adhäsiolyse)", min: 25 },
-          { id: "v_kolore", label: "Kolorektal (Segment-/Teilresektion)", min: 10 },
-          { id: "v_hepato", label: "Hepatobiliär / Leber / Pankreas / Bariatrisch", min: 5 },
-          { id: "v_endokrin", label: "Endokrine Chirurgie (Thyreoidektomie etc.)", min: 10 },
-          { id: "v_prokto", label: "Proktologie (inkl. Rektoskopie)", min: 35 },
-          { id: "v_splen", label: "Splenektomie", min: 3 },
-          { id: "v_stoma", label: "Dickdarmstoma", min: 5 },
-        ]
-      },
-      {
-        id: "trauma_c", label: "Modul Traumatologie", min: 165, optional: true,
-        items: [
-          { id: "ct_me", label: "Metallentfernungen, Spickungen", min: 30 },
-          { id: "ct_repo", label: "Repositionen (Frakturen, Luxationen)", min: 25 },
-          { id: "ct_sehnen", label: "Eingriffe Sehnen/Ligamente", min: 15 },
-          { id: "ct_arthro", label: "Arthroskopie", min: 10 },
-          { id: "ct_amp_k", label: "Amputationen klein", min: 5 },
-          { id: "ct_amp_g", label: "Amputationen gross", min: 5 },
-          { id: "ct_osteo_s", label: "Osteosynthese Schaftfrakturen", min: 15 },
-          { id: "ct_osteo_g", label: "Osteosynthese gelenksnahe Frakturen", min: 40 },
-          { id: "ct_komplex", label: "Komplexe Frakturen", min: 5 },
-          { id: "ct_hand", label: "Handchirurgie (exkl. Wundversorgung)", min: 15 },
-        ]
-      },
+      { id: "notfall", label: "A – Notfallchirurgie", min: 85, items: [
+        { id: "c_schockraum", label: "Schockraummanagement", min: 10 },
+        { id: "c_reposition", label: "Reposition Luxation/Frakturen, konservative Frakturbehandlung", min: 15 },
+        { id: "c_wunde", label: "Wundversorgungen", min: 30 },
+        { id: "c_fixateur", label: "Anlage Fixateur externe", min: 5 },
+        { id: "c_thorax", label: "Thoraxdrainagen", min: 15 },
+        { id: "c_zerviko", label: "Zervikotomien / Tracheafreilegung", min: 5 },
+        { id: "c_cystofix", label: "Cystofixeinlage", min: 5 },
+      ]},
+      { id: "allgemein", label: "B – Allgemeinchirurgie", min: 260, items: [
+        { id: "c_laparotomie", label: "Laparotomie", min: 15 },
+        { id: "c_laparoskopie", label: "Laparoskopie (diagnostisch/Zugang)", min: 15 },
+        { id: "c_appendektomie", label: "Appendektomie", min: 30 },
+        { id: "c_cholezyst", label: "Cholezystektomie", min: 30 },
+        { id: "c_hernie", label: "Hernienoperationen (inguinal/umbilical)", min: 40 },
+        { id: "c_duenndarm", label: "Dünndarmeingriffe, Stoma", min: 20 },
+        { id: "c_prokto", label: "Proktologische Eingriffe", min: 20 },
+        { id: "c_klein", label: "Kleinchirurgische Eingriffe", min: 40 },
+        { id: "c_venen", label: "Veneneingriffe (Varizen, Port/Pacemaker)", min: 30 },
+        { id: "c_weitere", label: "Weitere (Thorax, Uro, Gefässe, Endoskopie, Mamma)", min: 20 },
+      ]},
+      { id: "viszeral", label: "Wahlmodul Viszeralchirurgie", min: 165, optional: true, items: [
+        { id: "v_lap", label: "Laparoskopie / Laparotomie", min: 40 },
+        { id: "v_abdhern", label: "Abdominalhernien (Narbenhernien, videoskopisch)", min: 25 },
+        { id: "v_magen", label: "Mageneingriffe", min: 7 },
+        { id: "v_duenn", label: "Dünndarmeingriffe (Resektion, Adhäsiolyse)", min: 25 },
+        { id: "v_kolore", label: "Kolorektal (Segment-/Teilresektion)", min: 10 },
+        { id: "v_hepato", label: "Hepatobiliär / Leber / Pankreas / Bariatrisch", min: 5 },
+        { id: "v_endokrin", label: "Endokrine Chirurgie (Thyreoidektomie etc.)", min: 10 },
+        { id: "v_prokto", label: "Proktologie (inkl. Rektoskopie)", min: 35 },
+        { id: "v_splen", label: "Splenektomie", min: 3 },
+        { id: "v_stoma", label: "Dickdarmstoma", min: 5 },
+      ]},
+      { id: "trauma_c", label: "Wahlmodul Traumatologie", min: 165, optional: true, items: [
+        { id: "ct_me", label: "Metallentfernungen, Spickungen", min: 30 },
+        { id: "ct_repo", label: "Repositionen (Frakturen, Luxationen)", min: 25 },
+        { id: "ct_sehnen", label: "Eingriffe Sehnen/Ligamente", min: 15 },
+        { id: "ct_arthro", label: "Arthroskopie", min: 10 },
+        { id: "ct_amp_k", label: "Amputationen klein", min: 5 },
+        { id: "ct_amp_g", label: "Amputationen gross", min: 5 },
+        { id: "ct_osteo_s", label: "Osteosynthese Schaftfrakturen", min: 15 },
+        { id: "ct_osteo_g", label: "Osteosynthese gelenksnahe Frakturen", min: 40 },
+        { id: "ct_komplex", label: "Komplexe Frakturen", min: 5 },
+        { id: "ct_hand", label: "Handchirurgie (exkl. Wundversorgung)", min: 15 },
+      ]},
     ]
   },
 
   ortho: {
-    label: "Orthopädie / Traumatologie",
-    color: "#a78bfa",
-    type: "hierarchical",
-    // sections → regions → items  (3 levels)
+    label: "Orthopädie / Traumatologie", color: "#a78bfa", type: "hierarchical",
     sections: [
-      {
-        id: "o_prothetik", label: "Teil 1 – Prothetik", min: 30,
-        note: "Min. 30, Max. 90 gesamt · Max. 30 Assistenzen",
+      { id: "o_prothetik", label: "Teil 1 – Prothetik", sectionMin: 30, sectionMax: 90,
+        note: "Min. 30 · Max. 90 · Assistenz max. 30",
         regions: [
-          {
-            id: "op_gr1", label: "Gruppe 1 – Grosse Gelenke",
-            note: "Hüfte, Knie, Schulter, Wirbelsäule · Max. 60",
+          { id: "op_gr1", label: "Gr. 1 – Primäre Totalprothese grosse Gelenke",
+            note: "Hüfte · Knie (inkl. unikompartimental) · Schulter (inkl. invers) · Wirbelsäule (Diskusprothese)",
+            items: [{ id: "o_p1", label: "Primäre Totalprothese: Hüfte / Knie / Schulter / Wirbelsäule", min: 20, max: 60 }] },
+          { id: "op_gr2", label: "Gr. 2 – Primäre Totalprothese kleine Gelenke",
+            note: "Ellbogen · Handgelenk · Fingergelenke · OSG · Zehengelenke",
+            items: [{ id: "o_p2", label: "Primäre Totalprothese: Ellbogen / Handgelenk / Finger / OSG / Zehen", min: 0, max: 10 }] },
+          { id: "op_gr3", label: "Gr. 3 – Kopfprothesen",
+            note: "Hüfte · Knie (sekundäre Patella / femoropatellar) · Schulter",
+            items: [{ id: "o_p3", label: "Kopfprothese: Hüfte / Knie / Schulter", min: 0, max: 10 }] },
+          { id: "op_gr4", label: "Gr. 4 – Prothesenwechsel & Revision",
+            note: "Alle Regionen · Wechsel · Konversion · Ausbau / Girdlestone · Spacer · Wiedereinbau",
+            items: [{ id: "o_p4", label: "Prothesenwechsel / Konversion / Spacer / Girdlestone / Wiedereinbau", min: 1, max: 10 }] },
+        ]
+      },
+      { id: "o_osteo_art", label: "Teil 2 – Osteotomien & Arthrodesen", sectionMin: 15, sectionMax: 50,
+        note: "Min. 15 · Max. 50 · Assistenz max. 15",
+        regions: [
+          { id: "oo_gr1", label: "Gr. 1 – Becken / Hüfte",
+            note: "Periazetabuläre OT · Triple · Salter/Pemberton · Femur intertrochantär",
+            items: [{ id: "o_o1", label: "Becken/Hüfte: Periazetabuläre OT / Triple / Salter/Pemberton / Femur intertrochantär", min: 0, max: 20 }] },
+          { id: "oo_gr2", label: "Gr. 2 – Knienahe Achskorrektur",
+            note: "Femur distal · Tibia proximal · Korrekturosteotomien (alle ausser Hand/Fuss)",
+            items: [{ id: "o_o2", label: "Achsenkorrektur knienahe: Femur distal / Tibia proximal / Korrekturosteotomie", min: 3, max: 10 }] },
+          { id: "oo_gr3", label: "Gr. 3 – Hand / Fuss",
+            note: "Korrekturosteotomie · Osteotomie bei Hallux valgus",
+            items: [{ id: "o_o3", label: "Hand/Fuss: Korrekturosteotomie / Hallux valgus-Osteotomie", min: 5, max: 10 }] },
+          { id: "oo_gr4", label: "Gr. 4 – Arthrodesen",
+            note: "Alle Techniken · Alle Regionen",
+            items: [{ id: "o_o4", label: "Arthrodese (alle Techniken, alle Regionen)", min: 1, max: 10 }] },
+        ]
+      },
+      { id: "o_rekon", label: "Teil 3 – Rekonstruktive Eingriffe", sectionMin: 70, sectionMax: 140,
+        note: "Min. 70 · Max. 140 · Assistenz max. 70",
+        regions: [
+          { id: "or_gr1", label: "Gr. 1 – WS / Hüfte / Knie / Schulter (komplex)",
+            note: "WS: Laminektomie/Diskushernie/Spondylodese/Skoliose · Hüfte: FAI/Epiphysiolyse · Knie: VKB/HKB/Meniskusnaht/Patella-Maltracking · Schulter: RMC-Naht/Rekonstruktion/Stabilisation",
+            items: [{ id: "o_r1", label: "Gr.1: Wirbelsäule / Hüfte / Knie (VKB, HKB, Meniskusnaht) / Schulter (RMC, Stabilisation)", min: 10, max: 40 }] },
+          { id: "or_gr2", label: "Gr. 2 – Knie / Fuss / Schulter / Ellbogen / Handgelenk",
+            note: "Knie: Meniskektomie/Knorpel/Streckapparat · Fuss: Sehnenchir./OSG-Instab./Hallux/Hohmann/Ganglion/Exostosen · Schulter: Akromioplastik/Dekompression/Bizeps · Ellbogen: Bandnaht/Epikondylitis · HG/Hand: Sehnenchir./Bandchir./TFCC/Dupuytren/Ganglion",
+            items: [{ id: "o_r2", label: "Gr.2: Knie / Fuss / Schulter (Akromio, Dekompression) / Ellbogen / Handgelenk/Hand", min: 30, max: 60 }] },
+          { id: "or_gr3", label: "Gr. 3 – Lappenplastiken / Hauttransplantation",
+            note: "Alle Regionen · Freie Lappenplastik · Gestielte Hautlappen · Hauttransplantation",
+            items: [{ id: "o_r3", label: "Freie Lappenplastik / Hautlappen gestielt / Hauttransplantation", min: 5, max: 40 }] },
+          { id: "or_gr4", label: "Gr. 4 – Arthroskopie",
+            note: "Alle Regionen",
+            items: [{ id: "o_r4", label: "Arthroskopie (alle Regionen)", min: 40, max: 60 }] },
+        ]
+      },
+      { id: "o_synthese", label: "Teil 4 – Osteosynthesen", sectionMin: 65, sectionMax: 240,
+        note: "Min. 65 · Max. 240 · Assistenz max. 65",
+        regions: [
+          { id: "os_gr1", label: "Diametaphysär Gr. 1 – Femur · Tibia · Humerus · Radius · Ulna",
+            note: "AO Segment 2, Seg. 1+3 nur Gruppe A · Platte / Marknagel / Fixateur externe",
+            items: [{ id: "o_s1", label: "Diametaphysär Gr.1: Femur / Tibia / Humerus / Radius / Ulna", min: 20, max: 70 }] },
+          { id: "os_gr2", label: "Diametaphysär Gr. 2 – Clavicula · Scapula · AC · SC · Hand · Fuss",
+            note: "Clavicula · Scapula · AC-Luxation · SC-Luxation · Hand MC/P1/P2 · Fuss MT/P1/P2",
+            items: [{ id: "o_s2", label: "Diametaphysär Gr.2: Clavicula / Scapula / AC / SC / Hand MC-P / Fuss MT-P", min: 10, max: 40 }] },
+          { id: "os_gr3", label: "Artikulär Gr. 3 – Femur · Patella · Tibia · Glenoid · Humerus · Radius · Ulna",
+            note: "AO Seg. 1+3 nur Gruppen B+C",
+            items: [{ id: "o_s3", label: "Artikulär Gr.3: Femur / Patella / Tibia / Glenoid / Humerus / Radius / Ulna", min: 20, max: 70 }] },
+          { id: "os_gr4", label: "Artikulär Gr. 4 – Malleolus · Fusswurzel · Handwurzel",
+            note: "Malleolarfraktur · Fusswurzel/Fuss · Handwurzel/Hand",
+            items: [{ id: "o_s4", label: "Artikulär Gr.4: Malleolus / Fusswurzel / Handwurzel", min: 10, max: 40 }] },
+          { id: "os_gr5", label: "Stammskelett Gr. 5 – Acetabulum · Beckenring · Wirbelsäule",
+            note: "Alle Frakturtypen · inkl. C-Clamp · WK-Ersatz · Vertebro-/Kyphoplastik",
+            items: [{ id: "o_s5", label: "Stammskelett: Acetabulum / Beckenring / Wirbelsäule", min: 2, max: 20 }] },
+          { id: "os_impl", label: "Implantat-Mindestmengen (quer über alle Gruppen)",
+            note: "Separat erfassen nach Implantationstyp",
             items: [
-              { id: "o_p1_huefte", label: "Primäre Totalprothese Hüfte", min: 0, max: 60 },
-              { id: "o_p1_knie", label: "Primäre Totalprothese Knie (inkl. unikompartimental)", min: 0, max: 60 },
-              { id: "o_p1_schulter", label: "Primäre Totalprothese Schulter (inkl. invers)", min: 0, max: 60 },
-              { id: "o_p1_ws", label: "Diskusprothese Wirbelsäule", min: 0, max: 60 },
-            ]
-          },
-          {
-            id: "op_gr2", label: "Gruppe 2 – Kleine Gelenke",
-            note: "Ellbogen, Handgelenk, Finger, OSG, Zehengelenke · Max. 10",
-            items: [
-              { id: "o_p2_ellbogen", label: "Primäre Totalprothese Ellbogen", min: 0, max: 10 },
-              { id: "o_p2_hg", label: "Primäre Totalprothese Handgelenk", min: 0, max: 10 },
-              { id: "o_p2_finger", label: "Primäre Totalprothese Fingergelenk", min: 0, max: 10 },
-              { id: "o_p2_osg", label: "Primäre Totalprothese OSG", min: 0, max: 10 },
-              { id: "o_p2_zehe", label: "Primäre Totalprothese Zehengelenk", min: 0, max: 10 },
-            ]
-          },
-          {
-            id: "op_gr3", label: "Gruppe 3 – Kopfprothesen",
-            note: "Hüfte, Knie (sekundär Patella/femoropatellar), Schulter · Max. 10",
-            items: [
-              { id: "o_p3_huefte", label: "Kopfprothese Hüfte", min: 0, max: 10 },
-              { id: "o_p3_knie", label: "Sekundäre Patellaprothese / femoropatelläre Prothese Knie", min: 0, max: 10 },
-              { id: "o_p3_schulter", label: "Kopfprothese Schulter", min: 0, max: 10 },
-            ]
-          },
-          {
-            id: "op_gr4", label: "Gruppe 4 – Wechsel & Revision",
-            note: "Alle Regionen · Min. 1, Max. 10",
-            items: [
-              { id: "o_p4_wechsel", label: "Prothesenwechsel (alle Regionen)", min: 1, max: 10 },
-              { id: "o_p4_konversion", label: "Prothesenkonversion (Hemi→Total, Standard→Invers)", min: 0, max: 10 },
-              { id: "o_p4_ausbau", label: "Prothesenausbau / Girdlestone / Spacereinbau", min: 0, max: 10 },
-              { id: "o_p4_spacer", label: "Spacerwechsel / Prothesenwiedereinbau", min: 0, max: 10 },
+              { id: "o_impl_nagel", label: "Marknagel (alle Knochen)", min: 10 },
+              { id: "o_impl_platte", label: "Platte (alle Knochen)", min: 20 },
+              { id: "o_impl_fixateur", label: "Fixateur externe / K-Draht", min: 10 },
             ]
           },
         ]
       },
-      {
-        id: "o_osteo", label: "Teil 2 – Osteotomien & Arthrodesen", min: 15,
-        note: "Min. 15, Max. 50 gesamt · Max. 15 Assistenzen",
+      { id: "o_div", label: "Teil 5 – Diverses", sectionMin: 15, sectionMax: 260,
+        note: "Min. 15 · Max. 260 · Assistenz max. 20",
         regions: [
-          {
-            id: "oo_becken", label: "Becken / Hüfte",
-            note: "Max. 20",
+          { id: "od_gr1", label: "Gr. 1 – Tumorchirurgie",
+            note: "Max. 30 · Exzision maligne/benigne · Knochenmetastase · Biopsie",
+            items: [{ id: "o_d1", label: "Tumorchirurgie: Exzision maligne/benigne / Knochenmetastase / Biopsie", min: 0, max: 30 }] },
+          { id: "od_gr2", label: "Gr. 2 – Infektchirurgie",
+            note: "Min. 5 · Max. 20 · Débridement / Spüldrainage / arthroskopische Spülung",
+            items: [{ id: "o_d2", label: "Infektchirurgie: Débridement / Spüldrainage / arthroskopische Spülung", min: 5, max: 20 }] },
+          { id: "od_gr3", label: "Gr. 3 – Nervenchirurgie",
+            note: "Min. 5 · Max. 50 · Ulnarisverlagerung / Dekompression Medianus/Tibialis / Nervennaht",
+            items: [{ id: "o_d3", label: "Nervenchirurgie: Ulnarisverlagerung / Dekompression / Nervennaht/-rekonstruktion", min: 5, max: 50 }] },
+          { id: "od_gr4", label: "Gr. 4 – Knochen · Weichteile · Amputation",
+            note: "Separate Minima: Pseudarthrose/Knochen Min. 5 · Kompartment/Bursa Min. 5 · Amputation kein Min.",
             items: [
-              { id: "o_o1_pao", label: "Periazetabuläre Osteotomie", min: 0, max: 20 },
-              { id: "o_o1_triple", label: "Triple-Osteotomie", min: 0, max: 20 },
-              { id: "o_o1_salter", label: "Salter / Pemberton", min: 0, max: 20 },
-              { id: "o_o1_femur", label: "Intertrochantäre Femurosteotomie (alle Korrekturarten)", min: 0, max: 20 },
+              { id: "o_d4a", label: "Pseudarthrosenbehandlung / Knochenentnahme", min: 5, max: 10 },
+              { id: "o_d4b", label: "Kompartmentspaltung / Bursektomie", min: 5, max: 20 },
+              { id: "o_d4c", label: "Amputation", min: 0, max: 10 },
             ]
           },
-          {
-            id: "oo_knienahe", label: "Knienahe Achskorrektur",
-            note: "Femur distal, Tibia proximal · Min. 3, Max. 10",
-            items: [
-              { id: "o_o2_femur", label: "Distale Femurosteotomie (Achsenkorrektur)", min: 0, max: 10 },
-              { id: "o_o2_tibia", label: "Proximale Tibiaosteotomie (Achsenkorrektur)", min: 0, max: 10 },
-              { id: "o_o2_korrektur", label: "Korrekturosteotomie posttraumatisch/angeboren/erworben (Knie)", min: 0, max: 10 },
-            ]
-          },
-          {
-            id: "oo_hand_fuss", label: "Hand / Fuss",
-            note: "Min. 5, Max. 10",
-            items: [
-              { id: "o_o3_hallux", label: "Osteotomie bei Hallux valgus", min: 0, max: 10 },
-              { id: "o_o3_hand", label: "Korrekturosteotomie Hand (posttraumatisch, angeboren)", min: 0, max: 10 },
-              { id: "o_o3_fuss", label: "Korrekturosteotomie Fuss (posttraumatisch, angeboren)", min: 0, max: 10 },
-            ]
-          },
-          {
-            id: "oo_arthrodesen", label: "Arthrodesen",
-            note: "Alle Techniken, alle Regionen · Min. 1, Max. 10",
-            items: [
-              { id: "o_o4_alle", label: "Arthrodese (alle Techniken, alle Regionen)", min: 1, max: 10 },
-            ]
-          },
-        ]
-      },
-      {
-        id: "o_rekon", label: "Teil 3 – Rekonstruktive Eingriffe", min: 70,
-        note: "Min. 70, Max. 140 gesamt · Max. 70 Assistenzen",
-        regions: [
-          {
-            id: "or_ws", label: "Wirbelsäule",
-            note: "Min. 10 gesamt Gruppe 1, Max. 40",
-            items: [
-              { id: "o_r_laminektomie", label: "Laminektomie", min: 0, max: 40 },
-              { id: "o_r_diskus", label: "OP bei Diskushernie", min: 0, max: 40 },
-              { id: "o_r_spondylodese", label: "Spondylodese", min: 0, max: 40 },
-              { id: "o_r_skoliose", label: "Korrektur bei Skoliose / Kyphose", min: 0, max: 40 },
-            ]
-          },
-          {
-            id: "or_huefte", label: "Hüfte",
-            note: "Min. 10 gesamt Gruppe 1, Max. 40",
-            items: [
-              { id: "o_r_fai", label: "OP bei femoroazetabulärem Impingement (FAI)", min: 0, max: 40 },
-              { id: "o_r_epiphysio", label: "OP bei Epiphysiolyse", min: 0, max: 40 },
-            ]
-          },
-          {
-            id: "or_knie", label: "Knie",
-            note: "Gr.1: Min. 10 / Gr.2: Min. 30",
-            items: [
-              { id: "o_r_vkb", label: "VKB-Rekonstruktion / -Naht", min: 0, max: 40 },
-              { id: "o_r_hkb", label: "HKB-Rekonstruktion / -Naht", min: 0, max: 40 },
-              { id: "o_r_meniskusnaht", label: "Meniskusnaht", min: 0, max: 40 },
-              { id: "o_r_patella", label: "OP bei Patella-Maltracking", min: 0, max: 40 },
-              { id: "o_r_meniskektomie", label: "Meniskektomie", min: 0, max: 60 },
-              { id: "o_r_knorpel", label: "Knorpelrekonstruktion / Microfracture", min: 0, max: 60 },
-              { id: "o_r_streckapparat", label: "Naht / Rekonstruktion Streckapparat", min: 0, max: 60 },
-            ]
-          },
-          {
-            id: "or_schulter", label: "Schulter",
-            note: "Gr.1: Rotatorenmanschette / Stabilisation",
-            items: [
-              { id: "o_r_rmc_naht", label: "Rotatorenmanschettennaht", min: 0, max: 40 },
-              { id: "o_r_rmc_rekon", label: "Rotatorenmanschetten-Rekonstruktion", min: 0, max: 40 },
-              { id: "o_r_schulter_stab", label: "Schulterstabilisation (glenohumeral / AC-Gelenk)", min: 0, max: 40 },
-              { id: "o_r_akromio", label: "Akromioplastik / AC-Resektion", min: 0, max: 60 },
-              { id: "o_r_subakro", label: "Subakromiale Dekompression", min: 0, max: 60 },
-              { id: "o_r_bizeps", label: "Bizeps-Sehnenchirurgie", min: 0, max: 60 },
-            ]
-          },
-          {
-            id: "or_ellbogen", label: "Ellbogen",
-            items: [
-              { id: "o_r_ell_band", label: "Bandnaht / -Rekonstruktion Ellbogen", min: 0, max: 60 },
-              { id: "o_r_epikondylitis", label: "Epikondylitis-OP", min: 0, max: 60 },
-            ]
-          },
-          {
-            id: "or_fuss", label: "Fuss",
-            items: [
-              { id: "o_r_fuss_sehne", label: "Sehnenchirurgie Fuss", min: 0, max: 60 },
-              { id: "o_r_osg_instab", label: "OSG-Instabilität", min: 0, max: 60 },
-              { id: "o_r_hallux_wt", label: "Hallux valgus (nur Weichteile)", min: 0, max: 60 },
-              { id: "o_r_hohmann", label: "Hohmann-OP", min: 0, max: 60 },
-              { id: "o_r_ganglion", label: "Ganglion", min: 0, max: 60 },
-              { id: "o_r_exostose", label: "Exostosen-Resektion", min: 0, max: 60 },
-            ]
-          },
-          {
-            id: "or_hand_hg", label: "Handgelenk / Hand",
-            items: [
-              { id: "o_r_hg_sehne", label: "Sehnenchirurgie Handgelenk/Hand", min: 0, max: 60 },
-              { id: "o_r_hg_band", label: "Bandchirurgie Handgelenk", min: 0, max: 60 },
-              { id: "o_r_tfcc", label: "TFCC-Chirurgie", min: 0, max: 60 },
-              { id: "o_r_dupuytren", label: "Dupuytren-OP", min: 0, max: 60 },
-              { id: "o_r_hg_ganglion", label: "Ganglion Handgelenk", min: 0, max: 60 },
-            ]
-          },
-          {
-            id: "or_lappen", label: "Lappenplastiken / Hauttransplantation",
-            note: "Min. 5, Max. 40",
-            items: [
-              { id: "o_r_lappen_frei", label: "Freie Lappenplastik", min: 0, max: 40 },
-              { id: "o_r_lappen_gestielt", label: "Gestielte Hautlappen", min: 0, max: 40 },
-              { id: "o_r_hauttransplantat", label: "Hauttransplantation", min: 0, max: 40 },
-            ]
-          },
-          {
-            id: "or_arthro", label: "Arthroskopie",
-            note: "Min. 40, Max. 60 – alle Regionen",
-            items: [
-              { id: "o_r_arthro_knie", label: "Arthroskopie Knie", min: 0, max: 60 },
-              { id: "o_r_arthro_schulter", label: "Arthroskopie Schulter", min: 0, max: 60 },
-              { id: "o_r_arthro_huefte", label: "Arthroskopie Hüfte", min: 0, max: 60 },
-              { id: "o_r_arthro_osg", label: "Arthroskopie OSG", min: 0, max: 60 },
-              { id: "o_r_arthro_ell", label: "Arthroskopie Ellbogen", min: 0, max: 60 },
-              { id: "o_r_arthro_hg", label: "Arthroskopie Handgelenk", min: 0, max: 60 },
-            ]
-          },
-        ]
-      },
-      {
-        id: "o_synthese", label: "Teil 4 – Osteosynthesen", min: 65,
-        note: "Min. 65, Max. 240 gesamt · Max. 65 Assistenzen",
-        regions: [
-          {
-            id: "os_dia_gr1", label: "Diametaphysär – Gruppe 1 (lange Röhrenknochen)",
-            note: "AO Segment 2, Seg. 1+3 nur Gruppe A · Min. 20, Max. 70",
-            items: [
-              { id: "o_s1_femur", label: "Femur – Platte / Marknagel / Fixateur externe", min: 0, max: 70 },
-              { id: "o_s1_tibia", label: "Tibia – Platte / Marknagel / Fixateur externe", min: 0, max: 70 },
-              { id: "o_s1_humerus", label: "Humerus – Platte / Marknagel / Fixateur externe", min: 0, max: 70 },
-              { id: "o_s1_radius", label: "Radius – Platte / Marknagel / Fixateur externe", min: 0, max: 70 },
-              { id: "o_s1_ulna", label: "Ulna – Platte / Marknagel / Fixateur externe", min: 0, max: 70 },
-            ]
-          },
-          {
-            id: "os_dia_gr2", label: "Diametaphysär – Gruppe 2 (kurze Knochen)",
-            note: "Min. 10, Max. 40",
-            items: [
-              { id: "o_s2_clavicula", label: "Clavicula – alle Fixationstechniken", min: 0, max: 40 },
-              { id: "o_s2_scapula", label: "Scapula – alle Fixationstechniken", min: 0, max: 40 },
-              { id: "o_s2_ac", label: "AC-Luxation – alle Fixationstechniken", min: 0, max: 40 },
-              { id: "o_s2_sc", label: "SC-Luxation – alle Fixationstechniken", min: 0, max: 40 },
-              { id: "o_s2_mc", label: "Hand MC / P1 / P2 – alle Fixationstechniken", min: 0, max: 40 },
-              { id: "o_s2_mt", label: "Fuss MT / P1 / P2 – alle Fixationstechniken", min: 0, max: 40 },
-            ]
-          },
-          {
-            id: "os_art_gr3", label: "Artikulär – Gruppe 3 (grosse Gelenke)",
-            note: "AO Seg. 1+3 Gruppen B+C · Min. 20, Max. 70",
-            items: [
-              { id: "o_s3_femur", label: "Femur artikulär – alle Fixationstechniken", min: 0, max: 70 },
-              { id: "o_s3_patella", label: "Patella – alle Fixationstechniken", min: 0, max: 70 },
-              { id: "o_s3_tibia", label: "Tibia artikulär – alle Fixationstechniken", min: 0, max: 70 },
-              { id: "o_s3_glenoid", label: "Glenoid – alle Fixationstechniken", min: 0, max: 70 },
-              { id: "o_s3_humerus", label: "Humerus artikulär – alle Fixationstechniken", min: 0, max: 70 },
-              { id: "o_s3_radius", label: "Radius artikulär – alle Fixationstechniken", min: 0, max: 70 },
-              { id: "o_s3_ulna", label: "Ulna artikulär – alle Fixationstechniken", min: 0, max: 70 },
-            ]
-          },
-          {
-            id: "os_art_gr4", label: "Artikulär – Gruppe 4 (kleine Gelenke)",
-            note: "Min. 10, Max. 40",
-            items: [
-              { id: "o_s4_malleolus", label: "Malleolarfraktur – alle Fixationstechniken", min: 0, max: 40 },
-              { id: "o_s4_fusswurzel", label: "Fusswurzel / Fuss – alle Fixationstechniken", min: 0, max: 40 },
-              { id: "o_s4_handwurzel", label: "Handwurzel / Hand – alle Fixationstechniken", min: 0, max: 40 },
-            ]
-          },
-          {
-            id: "os_stamm", label: "Stammskelett",
-            note: "Acetabulum / Beckenring / Wirbelsäule · Min. 2, Max. 20",
-            items: [
-              { id: "o_s5_acetabulum", label: "Acetabulum – alle Fixationstechniken", min: 0, max: 20 },
-              { id: "o_s5_becken", label: "Beckenring – alle Fixationstechniken (inkl. C-Clamp, Fixateur)", min: 0, max: 20 },
-              { id: "o_s5_ws", label: "Wirbelsäule – alle Fixationstechniken / WK-Ersatz / Vertebroplastik", min: 0, max: 20 },
-            ]
-          },
-        ]
-      },
-      {
-        id: "o_div", label: "Teil 5 – Diverses", min: 20,
-        note: "Min. 20, Max. 260 gesamt · Max. 20 Assistenzen",
-        regions: [
-          {
-            id: "od_tumor", label: "Tumorchirurgie",
-            note: "Max. 30",
-            items: [
-              { id: "o_d1_maligne", label: "Exzision maligner Tumor", min: 0, max: 30 },
-              { id: "o_d1_benigne", label: "Exzision benigner Tumor", min: 0, max: 30 },
-              { id: "o_d1_metastase", label: "OP bei Knochenmetastase", min: 0, max: 30 },
-              { id: "o_d1_biopsie", label: "Biopsie", min: 0, max: 30 },
-            ]
-          },
-          {
-            id: "od_infekt", label: "Infektchirurgie",
-            note: "Min. 5, Max. 20",
-            items: [
-              { id: "o_d2_gelenk", label: "OP bei Gelenkinfekt (Débridement, arthroskopische Spülung)", min: 0, max: 20 },
-              { id: "o_d2_weichteile", label: "Weichteil-Débridement / Spüldrainage", min: 0, max: 20 },
-              { id: "o_d2_knochen", label: "Knocheninfekt (Débridement, Sequesterektomie)", min: 0, max: 20 },
-            ]
-          },
-          {
-            id: "od_nerven", label: "Nervenchirurgie",
-            note: "Min. 5, Max. 50",
-            items: [
-              { id: "o_d3_ulnaris", label: "Ulnarisverlagerung", min: 0, max: 50 },
-              { id: "o_d3_medianus", label: "Dekompression N. medianus (Hand)", min: 0, max: 50 },
-              { id: "o_d3_tibialis", label: "Dekompression N. tibialis (Fuss)", min: 0, max: 50 },
-              { id: "o_d3_naht", label: "Nervennaht / -Rekonstruktion (alle Regionen)", min: 0, max: 50 },
-            ]
-          },
-          {
-            id: "od_knochen", label: "Knochen / Weichteile / Amputation",
-            note: "Min. 5, Max. 30",
-            items: [
-              { id: "o_d4_pseudarthrose", label: "Pseudarthrosenbehandlung / Knochenentnahme", min: 0, max: 20 },
-              { id: "o_d4_kompartment", label: "Kompartmentspaltung", min: 0, max: 20 },
-              { id: "o_d4_bursa", label: "Bursektomie", min: 0, max: 20 },
-              { id: "o_d4_amputation", label: "Amputation", min: 0, max: 10 },
-            ]
-          },
-          {
-            id: "od_zugang", label: "Zugang / Metallentfernung",
+          { id: "od_gr5", label: "Gr. 5 – Zugang / Metallentfernung",
             note: "Max. 100 anrechenbar",
-            items: [
-              { id: "o_d5_zugang", label: "Zugang mit oder ohne Metallentfernung", min: 0, max: 100 },
-            ]
-          },
+            items: [{ id: "o_d5", label: "Zugang mit oder ohne Metallentfernung", min: 0, max: 100 }] },
         ]
       },
-      {
-        id: "o_region", label: "Nebenkriterium – Anatomische Region", min: 175,
-        note: "Wird automatisch aus Teil 4 Osteosynthesen berechnet (nur Rolle V)",
+      { id: "o_region", label: "Nebenkriterium – Anatomische Region", sectionMin: 175,
+        note: "Automatisch aus Teil 4 Osteosynthesen berechnet (nur Rolle V)",
         regional: true,
         regions: [
-          {
-            id: "oreg_obere", label: "Obere Extremität",
+          { id: "oreg_rumpf", label: "Rumpf / Becken",
+            items: [{ id: "r_acetabulum", label: "Acetabulum / Beckenring / Wirbelsäule", min: 2 }] },
+          { id: "oreg_obere", label: "Obere Extremität",
             items: [
               { id: "r_schulterguertel", label: "Schultergürtel (Clavicula, Scapula, AC-/SC-Gelenk)", min: 5 },
               { id: "r_schultergelenk", label: "Schultergelenk", min: 10 },
@@ -398,14 +184,7 @@ const CATALOG = {
               { id: "r_hand", label: "Hand MC, P1–3", min: 20 },
             ]
           },
-          {
-            id: "oreg_rumpf", label: "Rumpf / Becken",
-            items: [
-              { id: "r_acetabulum", label: "Acetabulum / Beckenring / Wirbelsäule", min: 2 },
-            ]
-          },
-          {
-            id: "oreg_untere", label: "Untere Extremität",
+          { id: "oreg_untere", label: "Untere Extremität",
             items: [
               { id: "r_hueft", label: "Hüftgelenk", min: 15 },
               { id: "r_oberschenkel", label: "Oberschenkel", min: 10 },
@@ -421,112 +200,86 @@ const CATALOG = {
   },
 
   hand: {
-    label: "Handchirurgie",
-    color: "#fb923c",
-    type: "flat",
+    label: "Handchirurgie", color: "#fb923c", type: "flat",
     sections: [
-      {
-        id: "h_nichtop", label: "Nicht-operative Therapie", min: 159,
-        items: [
-          { id: "h_n1", label: "Primäre Behandlung Handverletzungen", min: 100 },
-          { id: "h_n2", label: "Abklärung Rheuma-/Systemerkrankungen", min: 10 },
-          { id: "h_n3", label: "Interdisziplinäres Konzept bösartige Tumore", min: 5 },
-          { id: "h_n4", label: "Konservative Behandlung Infektionen", min: 5 },
-          { id: "h_n5", label: "Beurteilung angeborene Fehlbildungen", min: 5 },
-          { id: "h_n6", label: "Behandlung CRPS", min: 10 },
-          { id: "h_n7", label: "Konservative Behandlung degenerativer Pathologien", min: 20 },
-          { id: "h_n8", label: "Konservative Behandlung Epicondylitis", min: 4 },
-        ]
-      },
-      {
-        id: "h_infekt", label: "Operative – Infektionen & Dupuytren", min: 61,
-        items: [
-          { id: "h_i1", label: "Wundinfektion obere Extremität", min: 10 },
-          { id: "h_i2", label: "Paronychie, Panaritium", min: 20 },
-          { id: "h_i3", label: "Beugesehneninfektion (Empyem)", min: 10 },
-          { id: "h_i4", label: "Dupuytren operative Erstbehandlung", min: 15 },
-          { id: "h_i5", label: "Dupuytren interventionell (Fasziotomie, enzymatisch)", min: 6 },
-        ]
-      },
-      {
-        id: "h_weich", label: "Operative – Weichteile & Tumore", min: 69,
-        items: [
-          { id: "h_w1", label: "Tendovaginitis de Quervain", min: 10 },
-          { id: "h_w2", label: "Tendovaginitis stenosans", min: 20 },
-          { id: "h_w3", label: "Sehnenscheidenganglion", min: 5 },
-          { id: "h_w4", label: "Carpale Ganglien", min: 10 },
-          { id: "h_w5", label: "Tumore Weichteile (benigne/maligne, exkl. Ganglien)", min: 10 },
-          { id: "h_w6", label: "Tumore Knochen/Gelenke", min: 4 },
-          { id: "h_w7", label: "Resektion tumorähnlicher Veränderungen (Gicht)", min: 10 },
-        ]
-      },
-      {
-        id: "h_nerven", label: "Operative – Nerven", min: 96,
-        items: [
-          { id: "h_nerv1", label: "Naht Nervenast", min: 20 },
-          { id: "h_nerv2", label: "Naht Nervenstamm", min: 4 },
-          { id: "h_nerv3", label: "Transplantation Nervenast", min: 2 },
-          { id: "h_nerv4", label: "Transplantation Nervenstamm (nur A)", min: 0, assistOnly: true },
-          { id: "h_nerv5", label: "Dekompression N. medianus (CTS)", min: 40 },
-          { id: "h_nerv6", label: "Dekompression N. ulnaris Sulcus ulnaris", min: 6 },
-          { id: "h_nerv7", label: "Andere Kompressionsneuropathien", min: 4 },
-          { id: "h_nerv8", label: "Neurolyse (exkl. CTS)", min: 10 },
-          { id: "h_nerv9", label: "Nervenersatzoperation motorisch (Sehnentransfer)", min: 2 },
-          { id: "h_nerv10", label: "Schmerzhaftes Neurom", min: 8 },
-          { id: "h_nerv11", label: "Plexus brachialis (nur A)", min: 0, assistOnly: true },
-        ]
-      },
-      {
-        id: "h_haut", label: "Operative – Haut, Gefässe, Trauma", min: 68,
-        items: [
-          { id: "h_h1", label: "Freies Hauttransplantat (Spalthaut, Vollhaut, Nagelbett)", min: 10 },
-          { id: "h_h2", label: "Lokale Lappenplastik", min: 12 },
-          { id: "h_h3", label: "Axial gestielt / frei / mikrovaskulär", min: 4 },
-          { id: "h_h4", label: "Mikrochirurgische Anastomose Arterie/Vene", min: 16 },
-          { id: "h_h5", label: "Replantation / Revaskularisation bei Ischämie", min: 4 },
-          { id: "h_h6", label: "Andere Gefässeingriffe (nur A)", min: 0, assistOnly: true },
-          { id: "h_h7", label: "Amputation / Stumpfbildung / Revision", min: 12 },
-          { id: "h_h8", label: "Verbrennung / Verätzung / Stromverletzung / Kompartment", min: 10 },
-        ]
-      },
-      {
-        id: "h_sehnen", label: "Operative – Sehnen", min: 71,
-        items: [
-          { id: "h_s1", label: "Naht Beugesehne Digitalkanal Zone 2", min: 16 },
-          { id: "h_s2", label: "Naht Strecksehne / Beugesehne ausserhalb Digitalkanal", min: 30 },
-          { id: "h_s3", label: "Tenolyse Beuge-/Strecksehne", min: 10 },
-          { id: "h_s4", label: "Sehnenrekonstruktion (inkl. Transfer/Interponat)", min: 10 },
-          { id: "h_s5", label: "Andere Sehnenrekonstruktionen (Swan-Neck, Boutonnière)", min: 5 },
-        ]
-      },
-      {
-        id: "h_knochen", label: "Operative – Knochen", min: 95,
-        items: [
-          { id: "h_k1", label: "Geschlossene op. Frakturbehandlung (perk. K-Draht, Fixateur)", min: 20 },
-          { id: "h_k2", label: "Op. Frakturbehandlung Metacarpalia", min: 20 },
-          { id: "h_k3", label: "Op. Frakturbehandlung Phalangen", min: 20 },
-          { id: "h_k4", label: "Operation an Carpalia", min: 10 },
-          { id: "h_k5", label: "Pseudarthrosen / Korrekturosteotomien", min: 5 },
-          { id: "h_k6", label: "Op. Versorgung Radiusfrakturen (extra-/intraartikulär)", min: 15 },
-          { id: "h_k7", label: "Vorderarmfraktur / Radius-Ulna / Kombinationsverletzungen", min: 5 },
-        ]
-      },
-      {
-        id: "h_gelenke", label: "Operative – Gelenke", min: 101,
-        items: [
-          { id: "h_g1", label: "Bandnaht/-reinsertion carpal (SL, LT)", min: 5 },
-          { id: "h_g2", label: "TFCC-Naht/Refixation/Rekonstruktion", min: 5 },
-          { id: "h_g3", label: "Bandnaht/-refixation/-rekonstruktion Hand (übrige)", min: 12 },
-          { id: "h_g4", label: "Arthrolysen / Synovektomien", min: 15 },
-          { id: "h_g5", label: "CMC I – Arthrose (Trapezektomie etc.)", min: 15 },
-          { id: "h_g6", label: "Arthroplastik Hand / Handgelenk (exkl. CMC I)", min: 5 },
-          { id: "h_g7", label: "Arthrodesen Phalangen", min: 10 },
-          { id: "h_g8", label: "Arthrodese Handgelenk / Proximal Row Carpectomy", min: 5 },
-          { id: "h_g9", label: "Op. Behandlung Luxation (Finger, Handgelenk)", min: 4 },
-          { id: "h_g10", label: "Denervation (Finger, Handgelenk, Ellbogen)", min: 5 },
-          { id: "h_g11", label: "Arthroskopie Hand und Handgelenk", min: 20 },
-        ]
-      },
+      { id: "h_nichtop", label: "Nicht-operative Therapie", min: 159, items: [
+        { id: "h_n1", label: "Primäre Behandlung Handverletzungen", min: 100 },
+        { id: "h_n2", label: "Abklärung Rheuma-/Systemerkrankungen", min: 10 },
+        { id: "h_n3", label: "Interdisziplinäres Konzept bösartige Tumore", min: 5 },
+        { id: "h_n4", label: "Konservative Behandlung Infektionen", min: 5 },
+        { id: "h_n5", label: "Beurteilung angeborene Fehlbildungen", min: 5 },
+        { id: "h_n6", label: "Behandlung CRPS", min: 10 },
+        { id: "h_n7", label: "Konservative Behandlung degenerativer Pathologien", min: 20 },
+        { id: "h_n8", label: "Konservative Behandlung Epicondylitis", min: 4 },
+      ]},
+      { id: "h_infekt", label: "Operative – Infektionen & Dupuytren", min: 61, items: [
+        { id: "h_i1", label: "Wundinfektion obere Extremität", min: 10 },
+        { id: "h_i2", label: "Paronychie, Panaritium", min: 20 },
+        { id: "h_i3", label: "Beugesehneninfektion (Empyem)", min: 10 },
+        { id: "h_i4", label: "Dupuytren operative Erstbehandlung", min: 15 },
+        { id: "h_i5", label: "Dupuytren interventionell (Fasziotomie, enzymatisch)", min: 6 },
+      ]},
+      { id: "h_weich", label: "Operative – Weichteile & Tumore", min: 69, items: [
+        { id: "h_w1", label: "Tendovaginitis de Quervain", min: 10 },
+        { id: "h_w2", label: "Tendovaginitis stenosans", min: 20 },
+        { id: "h_w3", label: "Sehnenscheidenganglion", min: 5 },
+        { id: "h_w4", label: "Carpale Ganglien", min: 10 },
+        { id: "h_w5", label: "Tumore Weichteile (benigne/maligne, exkl. Ganglien)", min: 10 },
+        { id: "h_w6", label: "Tumore Knochen/Gelenke", min: 4 },
+        { id: "h_w7", label: "Resektion tumorähnlicher Veränderungen (Gicht)", min: 10 },
+      ]},
+      { id: "h_nerven", label: "Operative – Nerven", min: 96, items: [
+        { id: "h_nerv1", label: "Naht Nervenast", min: 20 },
+        { id: "h_nerv2", label: "Naht Nervenstamm", min: 4 },
+        { id: "h_nerv3", label: "Transplantation Nervenast", min: 2 },
+        { id: "h_nerv4", label: "Transplantation Nervenstamm (nur A)", min: 0, assistOnly: true },
+        { id: "h_nerv5", label: "Dekompression N. medianus (CTS)", min: 40 },
+        { id: "h_nerv6", label: "Dekompression N. ulnaris Sulcus ulnaris", min: 6 },
+        { id: "h_nerv7", label: "Andere Kompressionsneuropathien", min: 4 },
+        { id: "h_nerv8", label: "Neurolyse (exkl. CTS)", min: 10 },
+        { id: "h_nerv9", label: "Nervenersatzoperation motorisch (Sehnentransfer)", min: 2 },
+        { id: "h_nerv10", label: "Schmerzhaftes Neurom", min: 8 },
+        { id: "h_nerv11", label: "Plexus brachialis (nur A)", min: 0, assistOnly: true },
+      ]},
+      { id: "h_haut", label: "Operative – Haut, Gefässe, Trauma", min: 68, items: [
+        { id: "h_h1", label: "Freies Hauttransplantat (Spalthaut, Vollhaut, Nagelbett)", min: 10 },
+        { id: "h_h2", label: "Lokale Lappenplastik", min: 12 },
+        { id: "h_h3", label: "Axial gestielt / frei / mikrovaskulär", min: 4 },
+        { id: "h_h4", label: "Mikrochirurgische Anastomose Arterie/Vene", min: 16 },
+        { id: "h_h5", label: "Replantation / Revaskularisation bei Ischämie", min: 4 },
+        { id: "h_h6", label: "Andere Gefässeingriffe (nur A)", min: 0, assistOnly: true },
+        { id: "h_h7", label: "Amputation / Stumpfbildung / Revision", min: 12 },
+        { id: "h_h8", label: "Verbrennung / Verätzung / Stromverletzung / Kompartment", min: 10 },
+      ]},
+      { id: "h_sehnen", label: "Operative – Sehnen", min: 71, items: [
+        { id: "h_s1", label: "Naht Beugesehne Digitalkanal Zone 2", min: 16 },
+        { id: "h_s2", label: "Naht Strecksehne / Beugesehne ausserhalb Digitalkanal", min: 30 },
+        { id: "h_s3", label: "Tenolyse Beuge-/Strecksehne", min: 10 },
+        { id: "h_s4", label: "Sehnenrekonstruktion (inkl. Transfer/Interponat)", min: 10 },
+        { id: "h_s5", label: "Andere Sehnenrekonstruktionen (Swan-Neck, Boutonnière)", min: 5 },
+      ]},
+      { id: "h_knochen", label: "Operative – Knochen", min: 95, items: [
+        { id: "h_k1", label: "Geschlossene op. Frakturbehandlung (perk. K-Draht, Fixateur)", min: 20 },
+        { id: "h_k2", label: "Op. Frakturbehandlung Metacarpalia", min: 20 },
+        { id: "h_k3", label: "Op. Frakturbehandlung Phalangen", min: 20 },
+        { id: "h_k4", label: "Operation an Carpalia", min: 10 },
+        { id: "h_k5", label: "Pseudarthrosen / Korrekturosteotomien", min: 5 },
+        { id: "h_k6", label: "Op. Versorgung Radiusfrakturen (extra-/intraartikulär)", min: 15 },
+        { id: "h_k7", label: "Vorderarmfraktur / Radius-Ulna / Kombinationsverletzungen", min: 5 },
+      ]},
+      { id: "h_gelenke", label: "Operative – Gelenke", min: 101, items: [
+        { id: "h_g1", label: "Bandnaht/-reinsertion carpal (SL, LT)", min: 5 },
+        { id: "h_g2", label: "TFCC-Naht/Refixation/Rekonstruktion", min: 5 },
+        { id: "h_g3", label: "Bandnaht/-refixation/-rekonstruktion Hand (übrige)", min: 12 },
+        { id: "h_g4", label: "Arthrolysen / Synovektomien", min: 15 },
+        { id: "h_g5", label: "CMC I – Arthrose (Trapezektomie etc.)", min: 15 },
+        { id: "h_g6", label: "Arthroplastik Hand / Handgelenk (exkl. CMC I)", min: 5 },
+        { id: "h_g7", label: "Arthrodesen Phalangen", min: 10 },
+        { id: "h_g8", label: "Arthrodese Handgelenk / Proximal Row Carpectomy", min: 5 },
+        { id: "h_g9", label: "Op. Behandlung Luxation (Finger, Handgelenk)", min: 4 },
+        { id: "h_g10", label: "Denervation (Finger, Handgelenk, Ellbogen)", min: 5 },
+        { id: "h_g11", label: "Arthroskopie Hand und Handgelenk", min: 20 },
+      ]},
     ]
   }
 };
@@ -545,94 +298,96 @@ Object.entries(CATALOG).forEach(([spId, sp]) => {
   });
 });
 
-// ─── OSTEOSYNTHESE → ANATOMISCHE REGION MAPPING ──────────────────────────────
-// Only Teil 4 Osteosynthese items (o_s*) count toward the regional nebenkriterium.
-// Only role V counts (per SIWF: "als Operateur").
-// One case can cover multiple regions if multiple bones tagged.
-// Bilateral = two separate case entries by the user.
+// ─── OSTEOSYNTHESE → REGION OPTIONS ──────────────────────────────────────────
+// When a user tags an Osteosynthese group, a follow-up region picker appears
+// so the r_* tags get added automatically. This drives the Nebenkriterium.
+// Only role V is counted for regional totals.
 
-const OSTEO_TO_REGION = {
-  // Diametaphysär Gr.1 – lange Röhrenknochen
-  o_s1_femur:    "r_oberschenkel",
-  o_s1_tibia:    "r_unterschenkel",
-  o_s1_humerus:  "r_oberarm",
-  o_s1_radius:   "r_vorderarm",
-  o_s1_ulna:     "r_vorderarm",
-  // Diametaphysär Gr.2 – kurze Knochen
-  o_s2_clavicula: "r_schulterguertel",
-  o_s2_scapula:   "r_schulterguertel",
-  o_s2_ac:        "r_schulterguertel",
-  o_s2_sc:        "r_schulterguertel",
-  o_s2_mc:        "r_hand",
-  o_s2_mt:        "r_fuss",
-  // Artikulär Gr.3 – grosse Gelenke
-  o_s3_femur:    "r_hueft",       // proximal femur = Hüftgelenk
-  o_s3_patella:  "r_knie",
-  o_s3_tibia:    "r_knie",        // proximal tibia = Kniegelenk
-  o_s3_glenoid:  "r_schultergelenk",
-  o_s3_humerus:  "r_schultergelenk", // proximal humerus = Schultergelenk
-  o_s3_radius:   "r_handgelenk",  // distal radius = Handgelenk/Karpus
-  o_s3_ulna:     "r_ellbogen",    // olecranon = Ellbogengelenk
-  // Artikulär Gr.4 – kleine Gelenke
-  o_s4_malleolus:   "r_osg",
-  o_s4_fusswurzel:  "r_osg",      // Tarsus/OSG region
-  o_s4_handwurzel:  "r_handgelenk",
-  // Stammskelett
-  o_s5_acetabulum: "r_acetabulum",
-  o_s5_becken:     "r_acetabulum",
-  o_s5_ws:         "r_acetabulum", // Wirbelsäule → same region bucket
+const OSTEO_GROUP_REGIONS = {
+  o_s1: [
+    // Diametaphysär Gr.1: Femur/Tibia/Humerus/Radius/Ulna
+    { id: "r_oberschenkel",  label: "Femur → Oberschenkel" },
+    { id: "r_unterschenkel", label: "Tibia → Unterschenkel" },
+    { id: "r_oberarm",       label: "Humerus → Oberarm" },
+    { id: "r_vorderarm",     label: "Radius/Ulna → Vorderarm" },
+  ],
+  o_s2: [
+    // Diametaphysär Gr.2: Clavicula/Scapula/AC/SC/Hand/Fuss
+    { id: "r_schulterguertel", label: "Clavicula / Scapula / AC / SC → Schultergürtel" },
+    { id: "r_hand",            label: "Hand MC / P1–2 → Hand MC, P1–3" },
+    { id: "r_fuss",            label: "Fuss MT / P1–2 → Fuss MT, P1–3" },
+  ],
+  o_s3: [
+    // Artikulär Gr.3: Femur/Patella/Tibia/Glenoid/Humerus/Radius/Ulna
+    { id: "r_hueft",          label: "Femur proximal → Hüftgelenk" },
+    { id: "r_knie",           label: "Patella / Tibia proximal → Kniegelenk" },
+    { id: "r_schultergelenk", label: "Glenoid / Humerus proximal → Schultergelenk" },
+    { id: "r_handgelenk",     label: "Radius distal → Handgelenk / Karpus" },
+    { id: "r_ellbogen",       label: "Ulna proximal (Olekranon) → Ellbogengelenk" },
+  ],
+  o_s4: [
+    // Artikulär Gr.4: Malleolus/Fusswurzel/Handwurzel
+    { id: "r_osg",       label: "Malleolus / Fusswurzel → OSG / USG / Tarsus" },
+    { id: "r_handgelenk", label: "Handwurzel / Karpus → Handgelenk / Karpus" },
+  ],
+  o_s5: [
+    // Stammskelett: Acetabulum/Beckenring/Wirbelsäule
+    { id: "r_acetabulum", label: "Acetabulum / Beckenring / Wirbelsäule" },
+  ],
 };
 
-// Derive regional counts from osteosynthese tags (V only)
+function computeCounts(cases) {
+  const counts = {};
+  cases.forEach(c => {
+    c.tags.forEach(tag => {
+      if (!counts[tag]) counts[tag] = { V: 0, I: 0, A: 0 };
+      counts[tag][c.role] = (counts[tag][c.role] || 0) + 1;
+    });
+  });
+  return counts;
+}
+
 function computeRegionalCounts(cases) {
   const regional = {};
   cases.forEach(c => {
-    if (c.role !== "V") return; // only Verantwortlich counts
+    if (c.role !== "V") return;
     c.tags.forEach(tag => {
-      const region = OSTEO_TO_REGION[tag];
-      if (region) {
-        regional[region] = (regional[region] || 0) + 1;
+      if (tag.startsWith("r_")) {
+        regional[tag] = (regional[tag] || 0) + 1;
       }
     });
   });
   return regional;
 }
 
-// ─── STORAGE (Supabase) ───────────────────────────────────────────────────────
+function effectiveCount(counts, itemId) {
+  const c = counts[itemId] || { V: 0, I: 0, A: 0 };
+  return c.V + c.I;
+}
+
+// ─── STORAGE ──────────────────────────────────────────────────────────────────
 
 async function loadCases() {
   try {
-    const { data, error } = await supabase
-      .from("cases")
-      .select("*")
-      .order("date", { ascending: false });
+    const { data, error } = await supabase.from("cases").select("*").order("date", { ascending: false });
     if (error) throw error;
-    // tags is stored as JSON string in DB, parse it back
     return (data || []).map(row => ({
       ...row,
       tags: typeof row.tags === "string" ? JSON.parse(row.tags) : (row.tags || [])
     }));
-  } catch (e) {
-    console.error("Load error:", e);
-    return [];
-  }
+  } catch (e) { console.error("Load error:", e); return []; }
 }
 
 async function insertCase(entry) {
   try {
-    const { error } = await supabase
-      .from("cases")
-      .insert([{ ...entry, tags: JSON.stringify(entry.tags) }]);
+    const { error } = await supabase.from("cases").insert([{ ...entry, tags: JSON.stringify(entry.tags) }]);
     if (error) throw error;
   } catch (e) { console.error("Insert error:", e); }
 }
 
 async function deleteCase(id) {
   try {
-    const { error } = await supabase
-      .from("cases")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("cases").delete().eq("id", id);
     if (error) throw error;
   } catch (e) { console.error("Delete error:", e); }
 }
@@ -645,180 +400,207 @@ function formatDate(iso) {
   const [y, m, d] = iso.split("-");
   return `${d}.${m}.${y}`;
 }
-function computeCounts(cases) {
-  const counts = {};
-  cases.forEach(c => {
-    c.tags.forEach(tag => {
-      if (!counts[tag]) counts[tag] = { V: 0, I: 0, A: 0 };
-      counts[tag][c.role] = (counts[tag][c.role] || 0) + 1;
-    });
-  });
-  return counts;
-}
-function effectiveCount(counts, itemId) {
-  const c = counts[itemId] || { V: 0, I: 0, A: 0 };
-  return c.V + c.I;
-}
 
-// ─── SHARED STYLES ────────────────────────────────────────────────────────────
+// ─── DESIGN SYSTEM ────────────────────────────────────────────────────────────
 
 const ROLE_COLORS = { V: "#22c55e", I: "#f59e0b", A: "#64748b" };
 const ROLE_LABELS = { V: "Verantwortlich", I: "Instruierend", A: "Assistenz" };
 
-const labelStyle = {
-  display: "block", fontSize: 11, fontWeight: 600, letterSpacing: "0.06em",
-  textTransform: "uppercase", color: "#475569", marginBottom: 6
+// Clean white-on-dark design with warm neutrals
+const DS = {
+  bg:        "#0b0f1a",
+  surface:   "#111827",
+  surface2:  "#1a2235",
+  border:    "#1f2d45",
+  border2:   "#263248",
+  text:      "#f1f5f9",
+  textMuted: "#64748b",
+  textDim:   "#334155",
 };
-const inputStyle = {
-  width: "100%", padding: "11px 12px", borderRadius: 8,
-  border: "1px solid #1e293b", background: "#0d1829",
-  color: "#e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box",
-  fontFamily: "inherit"
-};
-const primaryBtn = (color, disabled) => ({
-  flex: 1, padding: "13px 0", borderRadius: 8, border: "none",
-  background: disabled ? "#1e293b" : color,
-  color: disabled ? "#334155" : "#0f172a",
-  cursor: disabled ? "not-allowed" : "pointer",
-  fontSize: 14, fontWeight: 700, transition: "all 0.2s", width: "100%"
-});
 
-function RoleBadge({ role, small }) {
+const inputStyle = {
+  width: "100%", padding: "12px 14px", borderRadius: 10,
+  border: `1px solid ${DS.border}`, background: DS.surface2,
+  color: DS.text, fontSize: 15, outline: "none",
+  boxSizing: "border-box", fontFamily: "inherit",
+  WebkitAppearance: "none",
+};
+
+const labelStyle = {
+  display: "block", fontSize: 11, fontWeight: 700,
+  letterSpacing: "0.08em", textTransform: "uppercase",
+  color: DS.textMuted, marginBottom: 8,
+};
+
+function RolePill({ role }) {
   return (
     <span style={{
-      display: "inline-block", padding: small ? "1px 6px" : "2px 8px",
-      borderRadius: 4, fontSize: small ? 10 : 11, fontWeight: 700,
-      background: ROLE_COLORS[role] + "22", color: ROLE_COLORS[role],
-      border: `1px solid ${ROLE_COLORS[role]}44`,
-      fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.05em"
+      padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700,
+      background: ROLE_COLORS[role] + "20", color: ROLE_COLORS[role],
+      border: `1px solid ${ROLE_COLORS[role]}40`,
+      fontFamily: "ui-monospace, monospace",
     }}>{role}</span>
   );
 }
 
-function MiniBar({ value, min, color }) {
-  if (!min) return null;
-  const pct = Math.min(100, Math.round((value / min) * 100));
-  const done = value >= min;
+function Bar({ value, min, max, color }) {
+  if (!min && !max) return null;
+  const target = min || max;
+  const pct = Math.min(100, target > 0 ? Math.round((value / target) * 100) : 0);
+  const done = min ? value >= min : false;
+  const capped = max && value > max;
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-      <div style={{ flex: 1, height: 4, borderRadius: 2, background: "#1e293b" }}>
-        <div style={{ width: `${pct}%`, height: "100%", borderRadius: 2, background: done ? "#22c55e" : color, transition: "width 0.3s" }} />
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+      <div style={{ flex: 1, height: 5, borderRadius: 3, background: DS.border, overflow: "hidden" }}>
+        <div style={{
+          width: `${pct}%`, height: "100%", borderRadius: 3,
+          background: done ? "#22c55e" : capped ? "#ef4444" : color,
+          transition: "width 0.35s ease",
+          opacity: 0.85
+        }} />
       </div>
-      <span style={{ fontSize: 10, minWidth: 36, textAlign: "right", color: done ? "#22c55e" : "#64748b", fontFamily: "'JetBrains Mono', monospace" }}>
-        {value}/{min}
+      <span style={{
+        fontSize: 11, minWidth: 52, textAlign: "right",
+        color: done ? "#22c55e" : capped ? "#ef4444" : DS.textMuted,
+        fontFamily: "ui-monospace, monospace", fontWeight: 600,
+      }}>
+        {value}{min ? `/${min}` : ""}{max && !min ? `  ≤${max}` : ""}
       </span>
     </div>
   );
 }
 
-// ─── HIERARCHICAL TAG PICKER (Ortho) ─────────────────────────────────────────
+// ─── TAG ITEM ─────────────────────────────────────────────────────────────────
+
+function TagItem({ item, selected, onToggle, color }) {
+  return (
+    <button onClick={() => onToggle(item.id)} style={{
+      display: "flex", alignItems: "flex-start", gap: 10,
+      width: "100%", textAlign: "left",
+      padding: "10px 12px", marginBottom: 4, borderRadius: 8,
+      border: `1px solid ${selected ? color + "80" : DS.border}`,
+      background: selected ? color + "15" : DS.surface,
+      color: selected ? DS.text : "#94a3b8",
+      cursor: "pointer", fontSize: 13, transition: "all 0.12s",
+    }}>
+      <span style={{
+        width: 17, height: 17, borderRadius: 4, flexShrink: 0, marginTop: 1,
+        border: `2px solid ${selected ? color : DS.border2}`,
+        background: selected ? color : "transparent",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: 10, color: "#fff", transition: "all 0.12s",
+      }}>{selected ? "✓" : ""}</span>
+      <span style={{ flex: 1, lineHeight: 1.4 }}>
+        {item.label}
+        {item.note && <span style={{ display: "block", fontSize: 11, color: DS.textMuted, marginTop: 2 }}>{item.note}</span>}
+        {item.assistOnly && <span style={{ fontSize: 10, color: DS.textDim }}> (nur A)</span>}
+      </span>
+    </button>
+  );
+}
+
+// ─── HIERARCHICAL PICKER (Ortho) ──────────────────────────────────────────────
 
 function OrthoTagPicker({ sp, tags, onToggle, search }) {
-  const [openSection, setOpenSection] = useState(null);
-  const [openRegion, setOpenRegion] = useState(null);
+  const [openSec, setOpenSec] = useState(null);
+  const [openReg, setOpenReg] = useState(null);
   const color = sp.color;
 
-  // if searching, flatten everything and show matching items only
-  if (search) {
+  const filteredSections = useMemo(() => {
+    if (!search) return sp.sections.filter(s => !s.regional);
     const q = search.toLowerCase();
+    return sp.sections.filter(s => !s.regional).map(sec => ({
+      ...sec,
+      regions: sec.regions.map(reg => ({
+        ...reg,
+        items: reg.items.filter(i =>
+          i.label.toLowerCase().includes(q) ||
+          reg.label.toLowerCase().includes(q) ||
+          sec.label.toLowerCase().includes(q)
+        )
+      })).filter(r => r.items.length > 0)
+    })).filter(s => s.regions.length > 0);
+  }, [search, sp.sections]);
+
+  if (search) {
     return (
       <div>
-        {sp.sections.filter(sec => !sec.regional).map(sec => {
-          const matchingRegions = sec.regions
-            .map(reg => ({
-              ...reg,
-              items: reg.items.filter(item => item.label.toLowerCase().includes(q) || sec.label.toLowerCase().includes(q) || reg.label.toLowerCase().includes(q))
-            }))
-            .filter(reg => reg.items.length > 0);
-          if (!matchingRegions.length) return null;
-          return (
-            <div key={sec.id} style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color, marginBottom: 6, letterSpacing: "0.08em", textTransform: "uppercase" }}>{sec.label}</div>
-              {matchingRegions.map(reg => (
-                <div key={reg.id} style={{ marginBottom: 6, paddingLeft: 8 }}>
-                  <div style={{ fontSize: 11, color: "#475569", marginBottom: 4 }}>{reg.label}</div>
-                  {reg.items.map(item => <TagItem key={item.id} item={item} selected={tags.includes(item.id)} onToggle={onToggle} color={color} />)}
-                </div>
-              ))}
-            </div>
-          );
-        })}
+        {filteredSections.map(sec => (
+          <div key={sec.id} style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color, marginBottom: 8, letterSpacing: "0.1em", textTransform: "uppercase" }}>{sec.label}</div>
+            {sec.regions.map(reg => (
+              <div key={reg.id} style={{ marginBottom: 8, paddingLeft: 8 }}>
+                <div style={{ fontSize: 11, color: DS.textMuted, marginBottom: 5 }}>{reg.label}</div>
+                {reg.items.map(item => <TagItem key={item.id} item={item} selected={tags.includes(item.id)} onToggle={onToggle} color={color} />)}
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     );
   }
 
   return (
     <div>
-      {sp.sections.filter(sec => !sec.regional).map(sec => {
-        const isSecOpen = openSection === sec.id;
-        const secSelectedCount = sec.regions.flatMap(r => r.items).filter(i => tags.includes(i.id)).length;
-
+      {filteredSections.map(sec => {
+        const isSecOpen = openSec === sec.id;
+        const selCount = sec.regions.flatMap(r => r.items).filter(i => tags.includes(i.id)).length;
         return (
           <div key={sec.id} style={{ marginBottom: 4 }}>
-            {/* Level 1: Teil */}
-            <button onClick={() => {
-              setOpenSection(isSecOpen ? null : sec.id);
-              setOpenRegion(null);
-            }} style={{
-              width: "100%", padding: "10px 12px", borderRadius: 8,
-              border: `1px solid ${isSecOpen ? color + "66" : "#1e293b"}`,
-              background: isSecOpen ? color + "12" : "#0d1829",
-              color: isSecOpen ? "#e2e8f0" : "#94a3b8",
+            <button onClick={() => { setOpenSec(isSecOpen ? null : sec.id); setOpenReg(null); }} style={{
+              width: "100%", padding: "11px 14px", borderRadius: 10,
+              border: `1px solid ${isSecOpen ? color + "60" : DS.border}`,
+              background: isSecOpen ? color + "12" : DS.surface,
+              color: isSecOpen ? DS.text : "#94a3b8",
               cursor: "pointer", textAlign: "left",
               display: "flex", justifyContent: "space-between", alignItems: "center",
               transition: "all 0.15s"
             }}>
-              <div>
-                <span style={{ fontSize: 13, fontWeight: 700 }}>{sec.label}</span>
-                {sec.note && <span style={{ fontSize: 10, color: "#475569", marginLeft: 8 }}>{sec.note}</span>}
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-                {secSelectedCount > 0 && (
-                  <span style={{ fontSize: 11, background: color + "33", color, borderRadius: 10, padding: "1px 7px", fontFamily: "'JetBrains Mono', monospace" }}>
-                    {secSelectedCount}
+              <span style={{ fontSize: 13, fontWeight: 700 }}>{sec.label}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {selCount > 0 && (
+                  <span style={{ fontSize: 11, background: color + "30", color, borderRadius: 10, padding: "1px 8px", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>
+                    {selCount}
                   </span>
                 )}
-                <span style={{ color: "#475569", fontSize: 12 }}>{isSecOpen ? "▾" : "▸"}</span>
+                <span style={{ color: DS.textMuted, fontSize: 13 }}>{isSecOpen ? "▾" : "▸"}</span>
               </div>
             </button>
 
             {isSecOpen && (
-              <div style={{ paddingLeft: 12, paddingTop: 4, paddingBottom: 4 }}>
+              <div style={{ paddingLeft: 10, paddingTop: 4, paddingBottom: 4 }}>
                 {sec.regions.map(reg => {
-                  const isRegOpen = openRegion === reg.id;
-                  const regSelectedCount = reg.items.filter(i => tags.includes(i.id)).length;
-
+                  const isRegOpen = openReg === reg.id;
+                  const regSel = reg.items.filter(i => tags.includes(i.id)).length;
                   return (
                     <div key={reg.id} style={{ marginBottom: 3 }}>
-                      {/* Level 2: Region */}
-                      <button onClick={() => setOpenRegion(isRegOpen ? null : reg.id)} style={{
-                        width: "100%", padding: "8px 10px", borderRadius: 6,
-                        border: `1px solid ${isRegOpen ? color + "44" : "#1a2a3a"}`,
-                        background: isRegOpen ? color + "0a" : "#0a1520",
-                        color: isRegOpen ? "#cbd5e1" : "#64748b",
+                      <button onClick={() => setOpenReg(isRegOpen ? null : reg.id)} style={{
+                        width: "100%", padding: "9px 12px", borderRadius: 8,
+                        border: `1px solid ${isRegOpen ? color + "40" : DS.border2}`,
+                        background: isRegOpen ? color + "0d" : DS.surface2,
+                        color: isRegOpen ? "#cbd5e1" : DS.textMuted,
                         cursor: "pointer", textAlign: "left",
-                        display: "flex", justifyContent: "space-between", alignItems: "center",
-                        transition: "all 0.15s"
+                        display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+                        transition: "all 0.12s"
                       }}>
-                        <div>
-                          <span style={{ fontSize: 12, fontWeight: 600 }}>{reg.label}</span>
-                          {reg.note && <span style={{ fontSize: 10, color: "#334155", marginLeft: 6 }}>{reg.note}</span>}
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 12, fontWeight: 600 }}>{reg.label}</div>
+                          {reg.note && <div style={{ fontSize: 10, color: DS.textDim, marginTop: 2 }}>{reg.note}</div>}
                         </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                          {regSelectedCount > 0 && (
-                            <span style={{ fontSize: 10, background: color + "22", color, borderRadius: 8, padding: "1px 5px", fontFamily: "'JetBrains Mono', monospace" }}>
-                              {regSelectedCount}
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 8, flexShrink: 0 }}>
+                          {regSel > 0 && (
+                            <span style={{ fontSize: 10, background: color + "25", color, borderRadius: 8, padding: "1px 5px", fontFamily: "ui-monospace, monospace" }}>
+                              {regSel}
                             </span>
                           )}
-                          <span style={{ color: "#334155", fontSize: 11 }}>{isRegOpen ? "▾" : "▸"}</span>
+                          <span style={{ color: DS.textDim, fontSize: 11 }}>{isRegOpen ? "▾" : "▸"}</span>
                         </div>
                       </button>
 
                       {isRegOpen && (
                         <div style={{ paddingLeft: 10, paddingTop: 4, paddingBottom: 2 }}>
-                          {/* Level 3: Eingriff */}
                           {reg.items.map(item => (
-                            <TagItem key={item.id} item={item} selected={tags.includes(item.id)} onToggle={onToggle} color={color} indent />
+                            <TagItem key={item.id} item={item} selected={tags.includes(item.id)} onToggle={onToggle} color={color} />
                           ))}
                         </div>
                       )}
@@ -834,90 +616,141 @@ function OrthoTagPicker({ sp, tags, onToggle, search }) {
   );
 }
 
-function TagItem({ item, selected, onToggle, color, indent }) {
-  return (
-    <button onClick={() => onToggle(item.id)} style={{
-      display: "flex", alignItems: "center", gap: 8,
-      width: "100%", textAlign: "left",
-      padding: indent ? "7px 10px" : "8px 12px",
-      marginBottom: 3, borderRadius: 6,
-      border: selected ? `1px solid ${color}` : "1px solid #1e293b",
-      background: selected ? color + "18" : "#0f172a",
-      color: selected ? "#f1f5f9" : "#94a3b8",
-      cursor: "pointer", fontSize: 12, transition: "all 0.1s",
-    }}>
-      <span style={{
-        width: 15, height: 15, borderRadius: 3, flexShrink: 0,
-        border: selected ? `2px solid ${color}` : "2px solid #334155",
-        background: selected ? color : "transparent",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 9, color: "#fff", lineHeight: 1
-      }}>{selected ? "✓" : ""}</span>
-      <span style={{ flex: 1 }}>{item.label}</span>
-      {item.assistOnly && <span style={{ fontSize: 10, color: "#334155", flexShrink: 0 }}>nur A</span>}
-    </button>
-  );
-}
-
-// ─── FLAT TAG PICKER (Chirurgie / Hand) ───────────────────────────────────────
+// ─── FLAT PICKER (Chirurgie / Hand) ───────────────────────────────────────────
 
 function FlatTagPicker({ sp, tags, onToggle, search }) {
-  const [openSection, setOpenSection] = useState(null);
+  const [openSec, setOpenSec] = useState(null);
   const color = sp.color;
 
-  if (search) {
+  const filteredSections = useMemo(() => {
+    if (!search) return sp.sections;
     const q = search.toLowerCase();
+    return sp.sections.map(sec => ({
+      ...sec,
+      items: sec.items.filter(i => i.label.toLowerCase().includes(q) || sec.label.toLowerCase().includes(q))
+    })).filter(s => s.items.length > 0);
+  }, [search, sp.sections]);
+
+  if (search) {
     return (
       <div>
-        {sp.sections.map(sec => {
-          const items = sec.items.filter(i => i.label.toLowerCase().includes(q) || sec.label.toLowerCase().includes(q));
-          if (!items.length) return null;
-          return (
-            <div key={sec.id} style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color, marginBottom: 6, letterSpacing: "0.08em", textTransform: "uppercase" }}>{sec.label}</div>
-              {items.map(item => <TagItem key={item.id} item={item} selected={tags.includes(item.id)} onToggle={onToggle} color={color} />)}
-            </div>
-          );
-        })}
+        {filteredSections.map(sec => (
+          <div key={sec.id} style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color, marginBottom: 8, letterSpacing: "0.1em", textTransform: "uppercase" }}>{sec.label}</div>
+            {sec.items.map(item => <TagItem key={item.id} item={item} selected={tags.includes(item.id)} onToggle={onToggle} color={color} />)}
+          </div>
+        ))}
       </div>
     );
   }
 
   return (
     <div>
-      {sp.sections.map(sec => {
-        const isOpen = openSection === sec.id;
+      {filteredSections.map(sec => {
+        const isOpen = openSec === sec.id;
         const selCount = sec.items.filter(i => tags.includes(i.id)).length;
         return (
           <div key={sec.id} style={{ marginBottom: 4 }}>
-            <button onClick={() => setOpenSection(isOpen ? null : sec.id)} style={{
-              width: "100%", padding: "10px 12px", borderRadius: 8,
-              border: `1px solid ${isOpen ? color + "66" : "#1e293b"}`,
-              background: isOpen ? color + "12" : "#0d1829",
-              color: isOpen ? "#e2e8f0" : "#94a3b8",
+            <button onClick={() => setOpenSec(isOpen ? null : sec.id)} style={{
+              width: "100%", padding: "11px 14px", borderRadius: 10,
+              border: `1px solid ${isOpen ? color + "60" : DS.border}`,
+              background: isOpen ? color + "12" : DS.surface,
+              color: isOpen ? DS.text : "#94a3b8",
               cursor: "pointer", textAlign: "left",
               display: "flex", justifyContent: "space-between", alignItems: "center",
               transition: "all 0.15s"
             }}>
               <div>
                 <span style={{ fontSize: 13, fontWeight: 700 }}>{sec.label}</span>
-                {sec.optional && <span style={{ fontSize: 10, color: "#475569", marginLeft: 8 }}>Wahlmodul</span>}
+                {sec.optional && <span style={{ fontSize: 10, color: DS.textMuted, marginLeft: 8 }}>Wahlmodul</span>}
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 {selCount > 0 && (
-                  <span style={{ fontSize: 11, background: color + "33", color, borderRadius: 10, padding: "1px 7px", fontFamily: "'JetBrains Mono', monospace" }}>
+                  <span style={{ fontSize: 11, background: color + "30", color, borderRadius: 10, padding: "1px 8px", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>
                     {selCount}
                   </span>
                 )}
-                <span style={{ color: "#475569", fontSize: 12 }}>{isOpen ? "▾" : "▸"}</span>
+                <span style={{ color: DS.textMuted, fontSize: 13 }}>{isOpen ? "▾" : "▸"}</span>
               </div>
             </button>
             {isOpen && (
-              <div style={{ paddingLeft: 12, paddingTop: 4, paddingBottom: 4 }}>
+              <div style={{ paddingLeft: 10, paddingTop: 4, paddingBottom: 4 }}>
                 {sec.items.map(item => <TagItem key={item.id} item={item} selected={tags.includes(item.id)} onToggle={onToggle} color={color} />)}
               </div>
             )}
           </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── REGION FOLLOW-UP PICKER ─────────────────────────────────────────────────
+// Shown automatically when any Osteosynthese group (o_s1–o_s5) is tagged.
+// Lets the user pick which anatomical region(s) were operated on,
+// which silently adds the r_* tags used for the Nebenkriterium.
+
+function RegionFollowUpPicker({ tags, onToggle }) {
+  // Find which osteo groups are currently tagged
+  const activeGroups = Object.keys(OSTEO_GROUP_REGIONS).filter(g => tags.includes(g));
+  if (activeGroups.length === 0) return null;
+
+  // Collect all region options from active groups, deduplicated
+  const seen = new Set();
+  const regionOptions = [];
+  activeGroups.forEach(g => {
+    OSTEO_GROUP_REGIONS[g].forEach(r => {
+      if (!seen.has(r.id)) {
+        seen.add(r.id);
+        regionOptions.push(r);
+      }
+    });
+  });
+
+  const selectedRegions = regionOptions.filter(r => tags.includes(r.id));
+
+  return (
+    <div style={{
+      margin: "12px 0 4px",
+      padding: "12px 14px",
+      borderRadius: 10,
+      background: "#f59e0b12",
+      border: "1px solid #f59e0b40",
+    }}>
+      <div style={{
+        fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
+        textTransform: "uppercase", color: "#f59e0b", marginBottom: 10,
+        display: "flex", justifyContent: "space-between", alignItems: "center"
+      }}>
+        <span>Anatomische Region (Nebenkriterium)</span>
+        <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 11 }}>
+          {selectedRegions.length} gewählt
+        </span>
+      </div>
+      <p style={{ fontSize: 11, color: DS.textMuted, margin: "0 0 10px", lineHeight: 1.5 }}>
+        Welche Region(en) wurden operiert? Zählt nur für Rolle V.
+      </p>
+      {regionOptions.map(r => {
+        const selected = tags.includes(r.id);
+        return (
+          <button key={r.id} onClick={() => onToggle(r.id)} style={{
+            display: "flex", alignItems: "center", gap: 10,
+            width: "100%", textAlign: "left",
+            padding: "9px 11px", marginBottom: 4, borderRadius: 8,
+            border: `1px solid ${selected ? "#f59e0b80" : DS.border}`,
+            background: selected ? "#f59e0b18" : DS.surface,
+            color: selected ? DS.text : "#94a3b8",
+            cursor: "pointer", fontSize: 12, transition: "all 0.12s",
+          }}>
+            <span style={{
+              width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+              border: `2px solid ${selected ? "#f59e0b" : DS.border2}`,
+              background: selected ? "#f59e0b" : "transparent",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 9, color: "#0b0f1a", transition: "all 0.12s",
+            }}>{selected ? "✓" : ""}</span>
+            {r.label}
+          </button>
         );
       })}
     </div>
@@ -937,66 +770,91 @@ function AddCaseView({ onSave }) {
   const [activeSpec, setActiveSpec] = useState("chirurgie");
   const [saved, setSaved] = useState(false);
 
-  const toggleTag = (id) => setTags(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
+  const toggleTag = useCallback((id) => {
+    setTags(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
+  }, []);
 
   const handleSave = () => {
-    if (!date) return;
+    if (!date || tags.length === 0) return;
     onSave({ id: Date.now().toString(), fallnr, date, role, note, tags });
     setSaved(true);
     setTimeout(() => {
       setFallnr(""); setDate(today()); setRole("V");
       setNote(""); setTags([]); setSearch(""); setStep(1); setSaved(false);
-    }, 900);
+    }, 800);
   };
 
-  const totalSelected = tags.length;
+  const spSelCounts = useMemo(() => {
+    const result = {};
+    Object.entries(CATALOG).forEach(([spId, sp]) => {
+      const allItems = sp.type === "hierarchical"
+        ? sp.sections.flatMap(s => s.regions?.flatMap(r => r.items) || [])
+        : sp.sections.flatMap(s => s.items);
+      result[spId] = allItems.filter(i => tags.includes(i.id)).length;
+    });
+    return result;
+  }, [tags]);
 
   return (
-    <div style={{ maxWidth: 560, margin: "0 auto", padding: "0 16px 80px" }}>
-      {/* Step bar */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 24, marginTop: 8 }}>
+    <div style={{ maxWidth: 560, margin: "0 auto", padding: "0 16px 100px" }}>
+      {/* Step indicator */}
+      <div style={{ display: "flex", gap: 6, marginTop: 8, marginBottom: 24 }}>
         {[1, 2].map(s => (
           <div key={s} onClick={() => setStep(s)} style={{
             flex: 1, height: 3, borderRadius: 2, cursor: "pointer",
-            background: step >= s ? "#60a5fa" : "#1e293b", transition: "background 0.2s"
+            background: step >= s ? "#60a5fa" : DS.border, transition: "background 0.2s"
           }} />
         ))}
       </div>
 
       {step === 1 && (
         <div>
-          <h2 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 700, color: "#f1f5f9" }}>Eingriff erfassen</h2>
-          <div style={{ marginBottom: 16 }}>
+          <h2 style={{ margin: "0 0 22px", fontSize: 20, fontWeight: 700, color: DS.text }}>Eingriff erfassen</h2>
+
+          <div style={{ marginBottom: 18 }}>
             <label style={labelStyle}>Fallnummer</label>
-            <input value={fallnr} onChange={e => setFallnr(e.target.value)} placeholder="z.B. 13224607" style={inputStyle} />
+            <input value={fallnr} onChange={e => setFallnr(e.target.value)}
+              placeholder="z.B. 13224607" style={inputStyle} />
           </div>
-          <div style={{ marginBottom: 16 }}>
+
+          <div style={{ marginBottom: 18 }}>
             <label style={labelStyle}>Datum</label>
             <input type="date" value={date} onChange={e => setDate(e.target.value)} style={inputStyle} />
           </div>
-          <div style={{ marginBottom: 20 }}>
+
+          <div style={{ marginBottom: 22 }}>
             <label style={labelStyle}>Funktion</label>
             <div style={{ display: "flex", gap: 8 }}>
               {["V", "I", "A"].map(r => (
                 <button key={r} onClick={() => setRole(r)} style={{
-                  flex: 1, padding: "12px 0", borderRadius: 8, border: "none", cursor: "pointer",
-                  fontWeight: 700, fontSize: 14,
-                  background: role === r ? ROLE_COLORS[r] + "22" : "#1e293b",
-                  color: role === r ? ROLE_COLORS[r] : "#475569",
-                  outline: role === r ? `2px solid ${ROLE_COLORS[r]}` : "none",
+                  flex: 1, padding: "14px 0", borderRadius: 10, border: "none", cursor: "pointer",
+                  fontWeight: 700, fontSize: 15,
+                  background: role === r ? ROLE_COLORS[r] + "25" : DS.surface2,
+                  color: role === r ? ROLE_COLORS[r] : DS.textMuted,
+                  outline: role === r ? `2px solid ${ROLE_COLORS[r]}80` : "none",
                   transition: "all 0.15s"
                 }}>
                   {r}
-                  <div style={{ fontSize: 10, fontWeight: 400, marginTop: 2, opacity: 0.7 }}>{ROLE_LABELS[r].slice(0, 10)}</div>
+                  <div style={{ fontSize: 10, fontWeight: 400, marginTop: 3, opacity: 0.7 }}>
+                    {ROLE_LABELS[r].slice(0, 12)}
+                  </div>
                 </button>
               ))}
             </div>
           </div>
+
           <div style={{ marginBottom: 24 }}>
-            <label style={labelStyle}>Freitext / Operation (optional)</label>
-            <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="z.B. Laparoskopische Appendektomie..." rows={2} style={{ ...inputStyle, resize: "none" }} />
+            <label style={labelStyle}>Freitext (optional)</label>
+            <textarea value={note} onChange={e => setNote(e.target.value)}
+              placeholder="z.B. Diagnose, Besonderheiten…" rows={2}
+              style={{ ...inputStyle, resize: "none" }} />
           </div>
-          <button onClick={() => setStep(2)} style={primaryBtn("#60a5fa")}>
+
+          <button onClick={() => setStep(2)} style={{
+            width: "100%", padding: "14px", borderRadius: 10, border: "none",
+            background: "#60a5fa", color: "#0b0f1a", cursor: "pointer",
+            fontSize: 15, fontWeight: 700,
+          }}>
             Kategorien auswählen →
           </button>
         </div>
@@ -1004,60 +862,66 @@ function AddCaseView({ onSave }) {
 
       {step === 2 && (
         <div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#f1f5f9" }}>Kategorien</h2>
-            <span style={{ fontSize: 12, color: "#60a5fa", fontFamily: "'JetBrains Mono', monospace" }}>{totalSelected} gewählt</span>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: DS.text }}>Kategorien</h2>
+            <span style={{ fontSize: 12, color: "#60a5fa", fontFamily: "ui-monospace, monospace", fontWeight: 600 }}>
+              {tags.length} gewählt
+            </span>
           </div>
-          <p style={{ fontSize: 12, color: "#64748b", margin: "0 0 12px" }}>
-            Ein Eingriff kann mehreren Fachgebieten und Kategorien zugeordnet werden.
+          <p style={{ fontSize: 12, color: DS.textMuted, margin: "0 0 14px", lineHeight: 1.5 }}>
+            Einem Eingriff können Kategorien aus mehreren Fachgebieten zugewiesen werden.
           </p>
 
           {/* Specialty tabs */}
           <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
-            {Object.entries(CATALOG).map(([id, s]) => {
-              const selCount = s.type === "hierarchical"
-                ? s.sections.flatMap(sec => sec.regions.flatMap(r => r.items)).filter(i => tags.includes(i.id)).length
-                : s.sections.flatMap(sec => sec.items).filter(i => tags.includes(i.id)).length;
-              return (
-                <button key={id} onClick={() => setActiveSpec(id)} style={{
-                  flex: 1, padding: "7px 4px", borderRadius: 8, border: "none", cursor: "pointer",
-                  fontWeight: 600, fontSize: 11,
-                  background: activeSpec === id ? s.color + "22" : "#1e293b",
-                  color: activeSpec === id ? s.color : "#475569",
-                  outline: activeSpec === id ? `1px solid ${s.color}` : "none",
-                  transition: "all 0.15s", position: "relative"
-                }}>
-                  {s.label.split(" / ")[0]}
-                  {selCount > 0 && (
-                    <span style={{
-                      position: "absolute", top: -4, right: -2,
-                      background: s.color, color: "#0f172a",
-                      borderRadius: 8, fontSize: 9, fontWeight: 700,
-                      padding: "1px 4px", fontFamily: "'JetBrains Mono', monospace"
-                    }}>{selCount}</span>
-                  )}
-                </button>
-              );
-            })}
+            {Object.entries(CATALOG).map(([id, s]) => (
+              <button key={id} onClick={() => setActiveSpec(id)} style={{
+                flex: 1, padding: "8px 4px", borderRadius: 8, border: "none", cursor: "pointer",
+                fontWeight: 600, fontSize: 11,
+                background: activeSpec === id ? s.color + "25" : DS.surface2,
+                color: activeSpec === id ? s.color : DS.textMuted,
+                outline: activeSpec === id ? `1.5px solid ${s.color}60` : "none",
+                transition: "all 0.15s", position: "relative"
+              }}>
+                {s.label.split(" / ")[0]}
+                {spSelCounts[id] > 0 && (
+                  <span style={{
+                    position: "absolute", top: -5, right: -2,
+                    background: s.color, color: "#0b0f1a",
+                    borderRadius: 8, fontSize: 9, fontWeight: 800,
+                    padding: "1px 5px", fontFamily: "ui-monospace, monospace"
+                  }}>{spSelCounts[id]}</span>
+                )}
+              </button>
+            ))}
           </div>
 
-          {/* Search */}
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Suchen…" style={{ ...inputStyle, marginBottom: 10 }} />
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Suchen…" style={{ ...inputStyle, marginBottom: 10 }} />
 
-          {/* Picker */}
-          <div style={{ maxHeight: "42vh", overflowY: "auto", paddingRight: 2 }}>
+          <div style={{ maxHeight: "38vh", overflowY: "auto", paddingRight: 2 }}>
             {CATALOG[activeSpec].type === "hierarchical"
               ? <OrthoTagPicker sp={CATALOG[activeSpec]} tags={tags} onToggle={toggleTag} search={search} />
               : <FlatTagPicker sp={CATALOG[activeSpec]} tags={tags} onToggle={toggleTag} search={search} />
             }
           </div>
 
-          <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+          {/* Auto region picker — appears when any Osteosynthese group is tagged */}
+          <RegionFollowUpPicker tags={tags} onToggle={toggleTag} />
+
+          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
             <button onClick={() => setStep(1)} style={{
-              flex: 1, padding: "13px 0", borderRadius: 8, border: "1px solid #1e293b",
-              background: "transparent", color: "#64748b", cursor: "pointer", fontSize: 14, fontWeight: 600
+              flex: 1, padding: "14px", borderRadius: 10,
+              border: `1px solid ${DS.border}`, background: "transparent",
+              color: DS.textMuted, cursor: "pointer", fontSize: 14, fontWeight: 600
             }}>← Zurück</button>
-            <button onClick={handleSave} disabled={tags.length === 0} style={primaryBtn(saved ? "#22c55e" : "#60a5fa", tags.length === 0)}>
+            <button onClick={handleSave} disabled={tags.length === 0} style={{
+              flex: 2, padding: "14px", borderRadius: 10, border: "none",
+              background: saved ? "#22c55e" : tags.length === 0 ? DS.surface2 : "#60a5fa",
+              color: tags.length === 0 ? DS.textDim : "#0b0f1a",
+              cursor: tags.length === 0 ? "not-allowed" : "pointer",
+              fontSize: 15, fontWeight: 700, transition: "all 0.2s"
+            }}>
               {saved ? "✓ Gespeichert" : "Speichern"}
             </button>
           </div>
@@ -1075,148 +939,149 @@ function ProgressView({ cases }) {
   const regionalCounts = useMemo(() => computeRegionalCounts(cases), [cases]);
   const sp = CATALOG[activeSpec];
 
+  const getCount = useCallback((item, isRegional) =>
+    isRegional ? (regionalCounts[item.id] || 0) : effectiveCount(counts, item.id),
+    [counts, regionalCounts]
+  );
+
   return (
-    <div style={{ maxWidth: 600, margin: "0 auto", padding: "0 16px 80px" }}>
-      <div style={{ display: "flex", gap: 6, marginTop: 8, marginBottom: 20, flexWrap: "wrap" }}>
+    <div style={{ maxWidth: 600, margin: "0 auto", padding: "0 16px 100px" }}>
+      {/* Specialty tabs */}
+      <div style={{ display: "flex", gap: 6, marginTop: 8, marginBottom: 20 }}>
         {Object.entries(CATALOG).map(([id, s]) => (
           <button key={id} onClick={() => setActiveSpec(id)} style={{
-            padding: "7px 14px", borderRadius: 20, border: "none", cursor: "pointer",
-            fontWeight: 600, fontSize: 12,
-            background: activeSpec === id ? s.color : "#1e293b",
-            color: activeSpec === id ? "#0f172a" : "#64748b",
+            flex: 1, padding: "8px 6px", borderRadius: 20, border: "none", cursor: "pointer",
+            fontWeight: 600, fontSize: 11,
+            background: activeSpec === id ? s.color : DS.surface,
+            color: activeSpec === id ? "#0b0f1a" : DS.textMuted,
             transition: "all 0.15s"
-          }}>{s.label}</button>
+          }}>{s.label.split(" / ")[0]}</button>
         ))}
       </div>
 
       {sp.sections.map(sec => {
-        // Regional section: use derived counts, not manual tags
-        const isRegional = sec.regional === true;
-
-        const items = sp.type === "hierarchical"
+        const isRegional = !!sec.regional;
+        const allItems = sp.type === "hierarchical"
           ? sec.regions.flatMap(r => r.items)
           : sec.items;
-
-        const getCount = (item) => isRegional
-          ? (regionalCounts[item.id] || 0)
-          : effectiveCount(counts, item.id);
-
-        const secTotal = items.reduce((s, i) => s + getCount(i), 0);
-        const secDone = sec.min ? secTotal >= sec.min : items.every(i => !i.min || getCount(i) >= i.min);
+        const secMin = sec.sectionMin || sec.min;
+        const secTotal = allItems.reduce((s, i) => s + getCount(i, isRegional), 0);
+        const secDone = secMin ? secTotal >= secMin : false;
+        const secColor = isRegional ? "#f59e0b" : sp.color;
 
         return (
           <div key={sec.id} style={{
-            background: "#0d1829", border: `1px solid ${secDone ? sp.color + "44" : "#1e293b"}`,
-            borderRadius: 10, marginBottom: 12, overflow: "hidden"
+            background: DS.surface, borderRadius: 12, marginBottom: 10, overflow: "hidden",
+            border: `1px solid ${secDone ? secColor + "50" : DS.border}`,
           }}>
-            <div style={{
-              padding: "10px 14px 8px", background: "#111f35",
-              borderBottom: `2px solid ${sec.regional ? "#f59e0b" : sp.color}`,
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: sec.min ? 7 : 0 }}>
+            {/* Section header */}
+            <div style={{ padding: "12px 14px 10px", borderBottom: `2px solid ${secColor}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: secMin ? 8 : 0 }}>
                 <div>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: secDone ? (sec.regional ? "#f59e0b" : sp.color) : "#cbd5e1" }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: secDone ? secColor : DS.text }}>
                     {secDone ? "✓ " : ""}{sec.label}
                   </span>
-                  {sec.regional && (
-                    <span style={{ fontSize: 10, color: "#f59e0b55", marginLeft: 6 }}>
-                      auto · nur V
-                    </span>
-                  )}
-                  {sec.optional && <span style={{ fontSize: 10, color: "#475569", marginLeft: 6 }}>Wahlmodul</span>}
-                  {sec.note && <div style={{ fontSize: 10, color: "#334155", marginTop: 1 }}>{sec.note}</div>}
+                  {sec.optional && <span style={{ fontSize: 10, color: DS.textMuted, marginLeft: 8 }}>Wahlmodul</span>}
+                  {isRegional && <span style={{ fontSize: 10, color: "#f59e0b80", marginLeft: 8 }}>auto · nur V</span>}
+                  {sec.note && <div style={{ fontSize: 10, color: DS.textDim, marginTop: 2 }}>{sec.note}</div>}
                 </div>
-                {sec.min ? (
-                  <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", flexShrink: 0, marginLeft: 12,
-                    color: secDone ? (sec.regional ? "#f59e0b" : sp.color) : "#475569" }}>
-                    {secTotal} / {sec.min}
+                {secMin && (
+                  <span style={{ fontSize: 12, fontFamily: "ui-monospace, monospace", fontWeight: 700, flexShrink: 0, marginLeft: 10, color: secDone ? secColor : DS.textMuted }}>
+                    {secTotal}/{secMin}
                   </span>
-                ) : null}
+                )}
               </div>
-              {sec.min ? (
-                <div style={{ height: 5, borderRadius: 3, background: "#0d1829", overflow: "hidden" }}>
+              {secMin && (
+                <div style={{ height: 5, borderRadius: 3, background: DS.border2, overflow: "hidden" }}>
                   <div style={{
-                    height: "100%", borderRadius: 3,
-                    width: `${Math.min(100, Math.round((secTotal / sec.min) * 100))}%`,
-                    background: secDone ? "#22c55e" : (sec.regional ? "#f59e0b" : sp.color),
-                    transition: "width 0.4s ease"
+                    height: "100%", borderRadius: 3, transition: "width 0.4s ease",
+                    width: `${Math.min(100, secMin > 0 ? Math.round((secTotal / secMin) * 100) : 0)}%`,
+                    background: secDone ? "#22c55e" : secColor,
                   }} />
                 </div>
-              ) : null}
+              )}
             </div>
-            <div style={{ padding: "8px 14px 10px" }}>
+
+            {/* Items */}
+            <div style={{ padding: "10px 14px 12px" }}>
               {sp.type === "hierarchical"
                 ? sec.regions.map(reg => {
-                  const regTotal = reg.items.reduce((s, i) => s + getCount(i), 0);
-                  const regMin = reg.items.reduce((s, i) => s + (i.min || 0), 0);
+                  const regItems = reg.items;
+                  const regTotal = regItems.reduce((s, i) => s + getCount(i, isRegional), 0);
+                  const regMin = regItems.reduce((s, i) => s + (i.min || 0), 0);
                   const regDone = regMin > 0 && regTotal >= regMin;
+
                   return (
-                  <div key={reg.id} style={{ marginBottom: 12 }}>
-                    <div style={{ marginBottom: 5, paddingBottom: 5, borderBottom: "1px solid #0f1f35" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: regMin ? 4 : 0 }}>
-                        <span style={{ fontSize: 11, color: regDone ? "#64748b" : "#475569", fontWeight: 600 }}>
-                          {reg.label}
-                        </span>
-                        {regMin > 0 && (
-                          <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", flexShrink: 0, marginLeft: 8,
-                            color: regDone ? "#22c55e" : "#334155" }}>
-                            {regTotal}/{regMin}
+                    <div key={reg.id} style={{ marginBottom: 12 }}>
+                      {/* Region subheader */}
+                      <div style={{ marginBottom: 6 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: regMin > 0 ? 4 : 0 }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: regDone ? "#64748b" : "#475569" }}>
+                            {reg.label}
                           </span>
+                          {regMin > 0 && (
+                            <span style={{ fontSize: 10, fontFamily: "ui-monospace, monospace", color: regDone ? "#22c55e" : DS.textDim, flexShrink: 0, marginLeft: 8 }}>
+                              {regTotal}/{regMin}
+                            </span>
+                          )}
+                        </div>
+                        {reg.note && <div style={{ fontSize: 10, color: DS.textDim, marginBottom: 4 }}>{reg.note}</div>}
+                        {regMin > 0 && (
+                          <div style={{ height: 3, borderRadius: 2, background: DS.border2, overflow: "hidden" }}>
+                            <div style={{
+                              height: "100%", borderRadius: 2,
+                              width: `${Math.min(100, Math.round((regTotal / regMin) * 100))}%`,
+                              background: regDone ? "#22c55e" : sp.color + "70",
+                              transition: "width 0.3s"
+                            }} />
+                          </div>
                         )}
                       </div>
-                      {regMin > 0 && (
-                        <div style={{ height: 3, borderRadius: 2, background: "#0a1520", overflow: "hidden" }}>
-                          <div style={{
-                            height: "100%", borderRadius: 2,
-                            width: `${Math.min(100, Math.round((regTotal / regMin) * 100))}%`,
-                            background: regDone ? "#22c55e" : sp.color + "88",
-                            transition: "width 0.3s"
-                          }} />
-                        </div>
-                      )}
-                      {reg.note && <div style={{ fontSize: 10, color: "#1e2d40", marginTop: 3 }}>{reg.note}</div>}
-                    </div>
-                    {reg.items.map(item => {
-                      const cnt = getCount(item);
-                      const rawC = counts[item.id] || { V: 0, I: 0, A: 0 };
-                      const done = !item.min || cnt >= item.min;
-                      return (
-                        <div key={item.id} style={{ marginBottom: 7 }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2, gap: 8 }}>
-                            <span style={{ fontSize: 11, color: done ? "#475569" : "#94a3b8", flex: 1 }}>{item.label}</span>
-                            <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-                              {isRegional
-                                ? cnt > 0 && <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: "#f59e0bcc" }}>V:{cnt}</span>
-                                : ["V", "I", "A"].map(r => rawC[r] > 0 && (
-                                  <span key={r} style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: ROLE_COLORS[r] + "cc" }}>{r}:{rawC[r]}</span>
-                                ))
-                              }
+
+                      {regItems.map(item => {
+                        const cnt = getCount(item, isRegional);
+                        const rawC = counts[item.id] || { V: 0, I: 0, A: 0 };
+                        const done = item.min && cnt >= item.min;
+                        return (
+                          <div key={item.id} style={{ marginBottom: 8, paddingLeft: 8 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                              <span style={{ fontSize: 12, color: done ? DS.textMuted : "#94a3b8", flex: 1, lineHeight: 1.4 }}>
+                                {item.label}
+                              </span>
+                              <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+                                {isRegional
+                                  ? cnt > 0 && <span style={{ fontSize: 10, fontFamily: "ui-monospace, monospace", color: "#f59e0baa" }}>V:{cnt}</span>
+                                  : ["V", "I", "A"].map(r => rawC[r] > 0 && (
+                                    <span key={r} style={{ fontSize: 10, fontFamily: "ui-monospace, monospace", color: ROLE_COLORS[r] + "bb" }}>{r}:{rawC[r]}</span>
+                                  ))
+                                }
+                              </div>
                             </div>
+                            <Bar value={cnt} min={item.min} max={item.max} color={isRegional ? "#f59e0b" : sp.color} />
                           </div>
-                          <MiniBar value={cnt} min={item.min} color={sec.regional ? "#f59e0b" : sp.color} />
-                        </div>
-                      );
-                    })}
-                  </div>
+                        );
+                      })}
+                    </div>
                   );
                 })
                 : sec.items.map(item => {
-                  const cnt = getCount(item);
+                  const cnt = getCount(item, false);
                   const rawC = counts[item.id] || { V: 0, I: 0, A: 0 };
-                  const done = !item.min || cnt >= item.min;
+                  const done = item.min && cnt >= item.min;
                   return (
-                    <div key={item.id} style={{ marginBottom: 8 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3, gap: 8 }}>
-                        <span style={{ fontSize: 12, color: done ? "#64748b" : "#cbd5e1", flex: 1 }}>
-                          {item.label}{item.assistOnly && <span style={{ fontSize: 10, color: "#475569" }}> (nur A)</span>}
+                    <div key={item.id} style={{ marginBottom: 10 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                        <span style={{ fontSize: 13, color: done ? DS.textMuted : "#cbd5e1", flex: 1, lineHeight: 1.4 }}>
+                          {item.label}
+                          {item.assistOnly && <span style={{ fontSize: 10, color: DS.textMuted }}> (nur A)</span>}
                         </span>
                         <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
                           {["V", "I", "A"].map(r => rawC[r] > 0 && (
-                            <span key={r} style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: ROLE_COLORS[r] + "cc" }}>{r}:{rawC[r]}</span>
+                            <span key={r} style={{ fontSize: 10, fontFamily: "ui-monospace, monospace", color: ROLE_COLORS[r] + "bb" }}>{r}:{rawC[r]}</span>
                           ))}
                         </div>
                       </div>
-                      <MiniBar value={cnt} min={item.min} color={sp.color} />
+                      <Bar value={cnt} min={item.min} max={item.max} color={sp.color} />
                     </div>
                   );
                 })
@@ -1227,6 +1092,47 @@ function ProgressView({ cases }) {
       })}
     </div>
   );
+}
+
+// ─── CSV EXPORT ───────────────────────────────────────────────────────────────
+
+function exportCSV(cases) {
+  // Build header
+  const headers = ["Datum", "Fallnummer", "Funktion", "Freitext", "Kategorien", "Fachgebiete"];
+
+  const rows = [...cases]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map(c => {
+      const tagLabels = c.tags
+        .map(t => ALL_ITEMS[t]?.label || t)
+        .filter(Boolean)
+        .join(" | ");
+
+      const specialties = [...new Set(
+        c.tags
+          .map(t => ALL_ITEMS[t]?.specialtyLabel)
+          .filter(Boolean)
+      )].join(" | ");
+
+      return [
+        formatDate(c.date),
+        c.fallnr || "",
+        c.role,
+        c.note || "",
+        tagLabels,
+        specialties,
+      ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(",");
+    });
+
+  const csv = [headers.join(","), ...rows].join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }); // BOM for Excel
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const dateStr = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `logbuch_${dateStr}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ─── CASES VIEW ───────────────────────────────────────────────────────────────
@@ -1245,34 +1151,72 @@ function CasesView({ cases, onDelete }) {
   }, [sorted, filter]);
 
   return (
-    <div style={{ maxWidth: 600, margin: "0 auto", padding: "0 16px 80px" }}>
-      <input value={filter} onChange={e => setFilter(e.target.value)} placeholder="Suchen…" style={{ ...inputStyle, marginTop: 8, marginBottom: 12 }} />
-      <div style={{ fontSize: 12, color: "#475569", marginBottom: 12 }}>{filtered.length} Eingriffe</div>
+    <div style={{ maxWidth: 600, margin: "0 auto", padding: "0 16px 100px" }}>
+      {/* Search + export row */}
+      <div style={{ display: "flex", gap: 8, marginTop: 8, marginBottom: 12 }}>
+        <input value={filter} onChange={e => setFilter(e.target.value)}
+          placeholder="Suchen…" style={{ ...inputStyle, flex: 1, marginTop: 0, marginBottom: 0 }} />
+        <button
+          onClick={() => exportCSV(cases)}
+          disabled={cases.length === 0}
+          title="CSV exportieren"
+          style={{
+            padding: "0 16px", borderRadius: 10, border: `1px solid ${DS.border}`,
+            background: DS.surface, color: cases.length === 0 ? DS.textDim : "#22c55e",
+            cursor: cases.length === 0 ? "not-allowed" : "pointer",
+            fontSize: 18, flexShrink: 0, display: "flex", alignItems: "center",
+            transition: "all 0.15s",
+          }}>
+          ↓
+        </button>
+      </div>
+      <div style={{ fontSize: 12, color: DS.textMuted, marginBottom: 12 }}>
+        {filtered.length} Eingriffe{cases.length > 0 && ` · `}
+        {cases.length > 0 && (
+          <span
+            onClick={() => exportCSV(cases)}
+            style={{ color: "#22c55e", cursor: "pointer", textDecoration: "underline" }}>
+            CSV exportieren ({cases.length} total)
+          </span>
+        )}
+      </div>
       {filtered.length === 0 && (
-        <div style={{ color: "#334155", fontSize: 14, textAlign: "center", padding: "40px 0" }}>Noch keine Eingriffe erfasst</div>
+        <div style={{ color: DS.textDim, fontSize: 14, textAlign: "center", padding: "48px 0" }}>
+          Noch keine Eingriffe erfasst
+        </div>
       )}
       {filtered.map(c => (
-        <div key={c.id} style={{ background: "#0d1829", border: "1px solid #1e293b", borderRadius: 10, padding: "12px 14px", marginBottom: 8 }}>
+        <div key={c.id} style={{
+          background: DS.surface, border: `1px solid ${DS.border}`,
+          borderRadius: 12, padding: "13px 14px", marginBottom: 8
+        }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-            <div>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0", fontFamily: "'JetBrains Mono', monospace" }}>{c.fallnr || "—"}</span>
-              <span style={{ fontSize: 12, color: "#475569", marginLeft: 10 }}>{formatDate(c.date)}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: DS.text, fontFamily: "ui-monospace, monospace" }}>
+                {c.fallnr || "—"}
+              </span>
+              <span style={{ fontSize: 12, color: DS.textMuted }}>{formatDate(c.date)}</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <RoleBadge role={c.role} small />
-              <button onClick={() => onDelete(c.id)} style={{ background: "none", border: "none", color: "#334155", cursor: "pointer", fontSize: 16, padding: "0 2px" }}>×</button>
+              <RolePill role={c.role} />
+              <button onClick={() => onDelete(c.id)} style={{
+                background: "none", border: "none", color: DS.textDim,
+                cursor: "pointer", fontSize: 18, padding: "0 2px", lineHeight: 1
+              }}>×</button>
             </div>
           </div>
-          {c.note && <div style={{ fontSize: 12, color: "#64748b", marginBottom: 6 }}>{c.note}</div>}
+          {c.note && <div style={{ fontSize: 12, color: DS.textMuted, marginBottom: 7 }}>{c.note}</div>}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
             {c.tags.map(t => {
               const item = ALL_ITEMS[t];
               if (!item) return null;
               const color = CATALOG[item.specialty]?.color || "#60a5fa";
               return (
-                <span key={t} style={{ fontSize: 10, padding: "2px 7px", borderRadius: 4, background: color + "18", color, border: `1px solid ${color}33` }}>
-                  {item.label}
-                </span>
+                <span key={t} style={{
+                  fontSize: 10, padding: "3px 8px", borderRadius: 6,
+                  background: color + "18", color, border: `1px solid ${color}30`,
+                  lineHeight: 1.4
+                }}>{item.label}</span>
               );
             })}
           </div>
@@ -1289,7 +1233,9 @@ export default function App() {
   const [view, setView] = useState("add");
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { loadCases().then(c => { setCases(c); setLoading(false); }); }, []);
+  useEffect(() => {
+    loadCases().then(c => { setCases(c); setLoading(false); });
+  }, []);
 
   const handleSave = useCallback(async (entry) => {
     await insertCase(entry);
@@ -1302,29 +1248,65 @@ export default function App() {
   }, []);
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: "#020c1b", display: "flex", alignItems: "center", justifyContent: "center", color: "#334155", fontSize: 14 }}>Lade…</div>
+    <div style={{ minHeight: "100vh", background: DS.bg, display: "flex", alignItems: "center", justifyContent: "center", color: DS.textMuted }}>
+      Lade…
+    </div>
   );
 
+  const NAV = [
+    { id: "add", icon: "＋", label: "Erfassen" },
+    { id: "progress", icon: "◎", label: "Fortschritt" },
+    { id: "cases", icon: "≡", label: `Eingriffe${cases.length ? ` (${cases.length})` : ""}` },
+  ];
+
   return (
-    <div style={{ minHeight: "100vh", background: "#020c1b", color: "#e2e8f0", fontFamily: "'IBM Plex Sans', system-ui, sans-serif" }}>
-      <div style={{ padding: "16px 20px 12px", background: "#020c1b", borderBottom: "1px solid #0f1f35", position: "sticky", top: 0, zIndex: 10 }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.2em", color: "#1d4ed8", textTransform: "uppercase", fontWeight: 700, marginBottom: 2 }}>SIWF</div>
-        <div style={{ fontSize: 17, fontWeight: 700, color: "#f1f5f9" }}>Operationslogbuch</div>
+    <div style={{ minHeight: "100vh", background: DS.bg, color: DS.text, fontFamily: "'Inter', system-ui, sans-serif" }}>
+      {/* Header */}
+      <div style={{
+        padding: "16px 20px 14px", background: DS.bg,
+        borderBottom: `1px solid ${DS.border}`,
+        position: "sticky", top: 0, zIndex: 10,
+        display: "flex", justifyContent: "space-between", alignItems: "center"
+      }}>
+        <div>
+          <div style={{ fontSize: 10, letterSpacing: "0.2em", color: "#3b82f6", textTransform: "uppercase", fontWeight: 800, marginBottom: 2 }}>SIWF</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: DS.text }}>Operationslogbuch</div>
+        </div>
+        <div style={{ fontSize: 12, color: DS.textMuted, textAlign: "right" }}>
+          <span style={{ fontSize: 20, fontWeight: 700, color: "#60a5fa", display: "block", lineHeight: 1 }}>{cases.length}</span>
+          Eingriffe
+        </div>
       </div>
+
+      {/* Content */}
       <div style={{ paddingTop: 16 }}>
         {view === "add" && <AddCaseView onSave={handleSave} />}
         {view === "progress" && <ProgressView cases={cases} />}
         {view === "cases" && <CasesView cases={cases} onDelete={handleDelete} />}
       </div>
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#020c1b", borderTop: "1px solid #0f1f35", display: "flex", padding: "8px 0 max(8px, env(safe-area-inset-bottom))" }}>
-        {[
-          { id: "add", icon: "＋", label: "Erfassen" },
-          { id: "progress", icon: "◎", label: "Fortschritt" },
-          { id: "cases", icon: "≡", label: `Eingriffe${cases.length ? ` (${cases.length})` : ""}` },
-        ].map(tab => (
-          <button key={tab.id} onClick={() => setView(tab.id)} style={{ flex: 1, background: "none", border: "none", cursor: "pointer", padding: "6px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-            <span style={{ fontSize: 18, lineHeight: 1, color: view === tab.id ? "#60a5fa" : "#334155", transition: "color 0.15s" }}>{tab.icon}</span>
-            <span style={{ fontSize: 10, fontWeight: 600, color: view === tab.id ? "#60a5fa" : "#334155", letterSpacing: "0.04em" }}>{tab.label}</span>
+
+      {/* Bottom nav */}
+      <div style={{
+        position: "fixed", bottom: 0, left: 0, right: 0,
+        background: DS.surface, borderTop: `1px solid ${DS.border}`,
+        display: "flex",
+        paddingBottom: "max(8px, env(safe-area-inset-bottom))",
+        paddingTop: 8,
+      }}>
+        {NAV.map(tab => (
+          <button key={tab.id} onClick={() => setView(tab.id)} style={{
+            flex: 1, background: "none", border: "none", cursor: "pointer",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 0"
+          }}>
+            <span style={{
+              fontSize: 20, lineHeight: 1,
+              color: view === tab.id ? "#60a5fa" : DS.textDim,
+              transition: "color 0.15s"
+            }}>{tab.icon}</span>
+            <span style={{
+              fontSize: 10, fontWeight: 600, letterSpacing: "0.04em",
+              color: view === tab.id ? "#60a5fa" : DS.textDim,
+            }}>{tab.label}</span>
           </button>
         ))}
       </div>
