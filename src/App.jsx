@@ -281,7 +281,57 @@ const CATALOG = {
         { id: "h_g11", label: "Arthroskopie Hand und Handgelenk", min: 20 },
       ]},
     ]
+  },
+
+  gefaess: {
+    label: "Gefässchirurgie", color: "#f43f5e", type: "flat",
+    dualRole: true, // O = V+I (Operateur/Instruierend), A = Assistenz (1. Hand)
+    roleNote: "V + I zählen als Operateur (O) · A = 1. Hand Assistenz",
+    sections: [
+      { id: "gf_arterien", label: "A – Offene Chirurgie der Arterien", items: [
+        { id: "gf_1", label: "1 – Chirurgie supraaortale Äste", note: "Karotis-TEA/-Eversion · A. carotis communis · A. vertebralis · A. subclavia / Truncus brachiocephalicus", minO: 20, minA: 25 },
+        { id: "gf_2", label: "2 – Arterielle Durchblutungsstörungen obere Extremitäten **", minO: 10, minA: 10 },
+        { id: "gf_3", label: "3 – Zugangswegechirurgie Hämodialyse", note: "Cimino-Brescia · Tabatière · Brachio-cephal · Kunststoffinterponat · andere Zugangswege", minO: 20, minA: 10 },
+        { id: "gf_4a", label: "4a – Thorako-abdominales Aneurysma", minO: 3, minA: 0 },
+        { id: "gf_4b", label: "4b – Viszerale Gefässoperationen", minO: 3, minA: 0 },
+        { id: "gf_4c", label: "4c – Eingriffe Nierenarterien *", minO: 3, minA: 5 },
+        { id: "gf_4d", label: "4d – Bauchaortenaneurysma elektiv (AAA)", minO: 20, minA: 20 },
+        { id: "gf_4e", label: "4e – Bauchaortenaneurysma rupturiert", minO: 5, minA: 5 },
+        { id: "gf_4f", label: "4f – AAA + Beckenarterienaneurysma", minO: 5, minA: 5 },
+        { id: "gf_4g", label: "4g – Aorto-iliakale Verschlusskrankheit **", minO: 8, minA: 8 },
+        { id: "gf_5a", label: "5a – Extra-anatomische Umleitung", minO: 5, minA: 5 },
+        { id: "gf_5b", label: "5b – Rekonstruktionen Femoralisgabel", note: "TEA der Femoralisgabel · retrograde iliakale Ringdesobliteration · Profundaplastik", minO: 25, minA: 20 },
+        { id: "gf_6a", label: "6a – Femoro-poplitealer Bypass supragenual (max. 5)", minO: 5, minA: 5 },
+        { id: "gf_6b", label: "6b – Femoro-poplitealer Bypass infragenual", minO: 10, minA: 10 },
+        { id: "gf_6c", label: "6c – Femoro-infrapoplitealer / cruraler Bypass", minO: 10, minA: 10 },
+        { id: "gf_6d", label: "6d – Popliteo-distaler / cruraler / pedaler Bypass", note: "In situ · reversed · prothetisch mit Cuff", minO: 5, minA: 5 },
+        { id: "gf_7", label: "7 – Revaskularisation bei akuten arteriellen Verschlüssen **", minO: 20, minA: 20 },
+        { id: "gf_8a", label: "8a – Fasziotomie", minO: 5, minA: 5 },
+        { id: "gf_8b", label: "8b – Aneurysmachirurgie untere Extremitäten", minO: 5, minA: 5 },
+        { id: "gf_8c", label: "8c – Septische Gefässchirurgie", note: "Mykotische Aneurysmen · infizierte Gefässprothesen", minO: 0, minA: 5 },
+      ]},
+      { id: "gf_venen", label: "B – Chirurgie der Venen", items: [
+        { id: "gf_9", label: "9 – Venöse Thrombektomie untere Extremitäten *", note: "Ilio-femorale Thrombektomie · Vieretagenthrombektomie · temporäre AV-Fistel", minO: 5, minA: 5 },
+        { id: "gf_10", label: "10 – Rekonstruktive Eingriffe tiefes Venensystem **", note: "Cross-over Bypass · Klappenrekonstruktion · Transplantation · Transposition · traumatische Venenläsionen", minO: 5, minA: 5 },
+        { id: "gf_11a", label: "11 – Varizenchirurgie", note: "Crossektomie · Varizenkonvolut · Stripping V. saphena · Perforantenunterbrechung · Kombinationen", minO: 60, minA: 20 },
+        { id: "gf_11b", label: "11f – Endovenöse Varizeneingriffe", minO: 10, minA: 0 },
+        { id: "gf_12", label: "12 – Eingriffe postthrombotisches Syndrom", note: "Ulcusexzision mit Fasziektomie · endoskopische Perforantenligatur · paratibiale Fasziotomie", minO: 5, minA: 5 },
+      ]},
+      { id: "gf_besondere", label: "C – Besondere Eingriffe", items: [
+        { id: "gf_13", label: "13 – Amputationen", note: "Klein (Zehen, Mittelfuss) · Gross (Unterschenkel, Oberschenkel)", minO: 10, minA: 5 },
+        { id: "gf_14", label: "14 – Sympathektomien", note: "Thorakal · Lumbal", minO: 0, minA: 0 },
+        { id: "gf_15", label: "15 – Kompressionssyndrome *", note: "Thoracic outlet syndrome · Entrapment syndrome", minO: 2, minA: 4 },
+        { id: "gf_16", label: "16 – Angiodysplasien", minO: 0, minA: 0 },
+        { id: "gf_17", label: "17 – Erkrankungen Lymphabfluss", minO: 0, minA: 0 },
+      ]},
+      { id: "gf_endovasc", label: "D – Endovaskuläre Eingriffe", note: "Auch bei Kombinationseingriffen anrechenbar · * = kompensierbar · ** = 50% durch endovaskuläre OPs", items: [
+        { id: "gf_18", label: "18 – Angiographie (arteriell + venös)", minO: 30, minA: 20 },
+        { id: "gf_19", label: "19 – Angioplastie / Stent / Katheterthrombektomie / Lyse / Hybrid", minO: 30, minA: 20 },
+        { id: "gf_20", label: "20 – Stent-Graft Aorta", minO: 10, minA: 10 },
+      ]},
+    ]
   }
+
 };
 
 // ─── FLAT ITEM LOOKUP ─────────────────────────────────────────────────────────
@@ -293,7 +343,7 @@ Object.entries(CATALOG).forEach(([spId, sp]) => {
       ? sec.regions.flatMap(r => r.items)
       : sec.items;
     items.forEach(item => {
-      ALL_ITEMS[item.id] = { ...item, specialty: spId, sectionId: sec.id, sectionLabel: sec.label, specialtyLabel: sp.label };
+      ALL_ITEMS[item.id] = { ...item, specialty: spId, sectionId: sec.id, sectionLabel: sec.label, specialtyLabel: sp.label, dualRole: !!sp.dualRole };
     });
   });
 });
@@ -403,8 +453,8 @@ function formatDate(iso) {
 
 // ─── DESIGN SYSTEM – VARIANT C (Warm Light) ──────────────────────────────────
 
-const ROLE_COLORS = { V: "#16a34a", I: "#d97706", A: "#94a3b8" };
-const ROLE_LABELS = { V: "Verantwortlich", I: "Instruierend", A: "Assistenz" };
+const ROLE_COLORS = { V: "#16a34a", I: "#d97706", A: "#94a3b8", O: "#16a34a" };
+const ROLE_LABELS = { V: "Verantwortlich", I: "Instruierend", A: "Assistenz", O: "Operateur" };
 
 // Warm light design — off-white bg, dark charcoal text, clean minimal
 const DS = {
@@ -413,9 +463,9 @@ const DS = {
   surface2:  "#eeede8",
   border:    "#d8d6cf",
   border2:   "#c4c2ba",
-  text:      "#1a1917",
-  textMuted: "#6b6860",
-  textDim:   "#a8a59d",
+  text:      "#111110",        // darker for max legibility
+  textMuted: "#4a4845",        // was #6b6860 — much more readable
+  textDim:   "#8a8780",        // was #a8a59d
 };
 
 const inputStyle = {
@@ -493,7 +543,11 @@ function TagItem({ item, selected, onToggle, color }) {
       }}>{selected ? "✓" : ""}</span>
       <span style={{ flex: 1, lineHeight: 1.4 }}>
         {item.label}
-        {item.note && <span style={{ display: "block", fontSize: 11, color: DS.textMuted, marginTop: 2 }}>{item.note}</span>}
+        {(item.note || item.groupNote) && (
+          <span style={{ display: "block", fontSize: 11, color: DS.textMuted, marginTop: 2 }}>
+            {item.note || item.groupNote}
+          </span>
+        )}
         {item.assistOnly && <span style={{ fontSize: 10, color: DS.textDim }}> (nur A)</span>}
       </span>
     </button>
@@ -532,7 +586,7 @@ function OrthoTagPicker({ sp, tags, onToggle, search }) {
             {sec.regions.map(reg => (
               <div key={reg.id} style={{ marginBottom: 8, paddingLeft: 8 }}>
                 <div style={{ fontSize: 11, color: DS.textMuted, marginBottom: 5 }}>{reg.label}</div>
-                {reg.items.map(item => <TagItem key={item.id} item={item} selected={tags.includes(item.id)} onToggle={onToggle} color={color} />)}
+                {reg.items.map(item => <TagItem key={item.id} item={{ ...item, note: item.note || reg.note }} selected={tags.includes(item.id)} onToggle={onToggle} color={color} />)}
               </div>
             ))}
           </div>
@@ -618,7 +672,7 @@ function OrthoTagPicker({ sp, tags, onToggle, search }) {
                       {isRegOpen && (
                         <div style={{ paddingLeft: 10, paddingTop: 4, paddingBottom: 2 }}>
                           {reg.items.map(item => (
-                            <TagItem key={item.id} item={item} selected={tags.includes(item.id)} onToggle={onToggle} color={color} />
+                            <TagItem key={item.id} item={{ ...item, groupNote: reg.note }} selected={tags.includes(item.id)} onToggle={onToggle} color={color} />
                           ))}
                         </div>
                       )}
@@ -977,6 +1031,11 @@ function ProgressView({ cases }) {
         ))}
       </div>
 
+      {sp.roleNote && (
+        <div style={{ fontSize: 11, color: DS.textMuted, marginBottom: 12, padding: "8px 12px", background: DS.surface, borderRadius: 8, border: `1px solid ${DS.border}` }}>
+          <strong style={{ color: DS.text }}>Rollen:</strong> {sp.roleNote}
+        </div>
+      )}
       {sp.sections.map(sec => {
         const isRegional = !!sec.regional;
         const allItems = sp.type === "hierarchical"
@@ -1036,7 +1095,7 @@ function ProgressView({ cases }) {
                       {!singleItem && (
                         <div style={{ marginBottom: 6 }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: regMin > 0 ? 4 : 0 }}>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: regDone ? "#64748b" : "#475569" }}>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: regDone ? DS.textMuted : DS.text }}>
                               {reg.label}
                             </span>
                             {regMin > 0 && (
@@ -1066,9 +1125,9 @@ function ProgressView({ cases }) {
                         // When single item: use region note as subtitle, no indent
                         return (
                           <div key={item.id} style={{ marginBottom: 8, paddingLeft: singleItem ? 0 : 8 }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
                               <div style={{ flex: 1 }}>
-                                <span style={{ fontSize: 12, color: done ? DS.textMuted : "#94a3b8", lineHeight: 1.4 }}>
+                                <span style={{ fontSize: 13, color: done ? DS.textMuted : DS.text, lineHeight: 1.4, fontWeight: 500 }}>
                                   {singleItem ? reg.label : item.label}
                                 </span>
                                 {singleItem && reg.note && (
@@ -1079,7 +1138,7 @@ function ProgressView({ cases }) {
                                 {isRegional
                                   ? cnt > 0 && <span style={{ fontSize: 10, fontFamily: "ui-monospace, monospace", color: "#f59e0baa" }}>V:{cnt}</span>
                                   : ["V", "I", "A"].map(r => rawC[r] > 0 && (
-                                    <span key={r} style={{ fontSize: 10, fontFamily: "ui-monospace, monospace", color: ROLE_COLORS[r] + "bb" }}>{r}:{rawC[r]}</span>
+                                    <span key={r} style={{ fontSize: 10, fontFamily: "ui-monospace, monospace", color: ROLE_COLORS[r], fontWeight: 700 }}>{r}:{rawC[r]}</span>
                                   ))
                                 }
                               </div>
@@ -1094,21 +1153,57 @@ function ProgressView({ cases }) {
                 : sec.items.map(item => {
                   const cnt = getCount(item, false);
                   const rawC = counts[item.id] || { V: 0, I: 0, A: 0 };
-                  const done = item.min && cnt >= item.min;
+                  const isDual = item.dualRole;
+                  const cntO = rawC.V + rawC.I; // O = Verantwortlich + Instruierend
+                  const cntA = rawC.A;
+                  const doneO = isDual ? (item.minO ? cntO >= item.minO : true) : (item.min && cnt >= item.min);
+                  const doneA = isDual ? (item.minA ? cntA >= item.minA : true) : true;
+                  const done = isDual ? (doneO && doneA) : doneO;
                   return (
-                    <div key={item.id} style={{ marginBottom: 10 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                        <span style={{ fontSize: 13, color: done ? DS.textMuted : "#cbd5e1", flex: 1, lineHeight: 1.4 }}>
-                          {item.label}
-                          {item.assistOnly && <span style={{ fontSize: 10, color: DS.textMuted }}> (nur A)</span>}
-                        </span>
+                    <div key={item.id} style={{ marginBottom: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, marginBottom: 3 }}>
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: 13, color: done ? DS.textMuted : DS.text, lineHeight: 1.4, fontWeight: 500 }}>
+                            {item.label}
+                            {item.assistOnly && <span style={{ fontSize: 10, color: DS.textMuted }}> (nur A)</span>}
+                          </span>
+                          {item.note && <div style={{ fontSize: 11, color: DS.textDim, marginTop: 2 }}>{item.note}</div>}
+                        </div>
                         <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-                          {["V", "I", "A"].map(r => rawC[r] > 0 && (
-                            <span key={r} style={{ fontSize: 10, fontFamily: "ui-monospace, monospace", color: ROLE_COLORS[r] + "bb" }}>{r}:{rawC[r]}</span>
-                          ))}
+                          {isDual ? (
+                            <>
+                              {(item.minO > 0 || cntO > 0) && <span style={{ fontSize: 11, fontFamily: "ui-monospace, monospace", fontWeight: 700, color: doneO ? "#16a34a" : DS.textMuted }}>O:{cntO}{item.minO ? `/${item.minO}` : ""}</span>}
+                              {(item.minA > 0 || cntA > 0) && <span style={{ fontSize: 11, fontFamily: "ui-monospace, monospace", fontWeight: 700, color: doneA ? "#2563eb" : DS.textMuted }}>A:{cntA}{item.minA ? `/${item.minA}` : ""}</span>}
+                            </>
+                          ) : (
+                            ["V", "I", "A"].map(r => rawC[r] > 0 && (
+                              <span key={r} style={{ fontSize: 11, fontFamily: "ui-monospace, monospace", fontWeight: 700, color: ROLE_COLORS[r] }}>{r}:{rawC[r]}</span>
+                            ))
+                          )}
                         </div>
                       </div>
-                      <Bar value={cnt} min={item.min} max={item.max} color={sp.color} />
+                      {isDual ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                          {item.minO > 0 && (
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <span style={{ fontSize: 10, color: "#16a34a", minWidth: 14, fontWeight: 700 }}>O</span>
+                              <div style={{ flex: 1, height: 6, borderRadius: 3, background: DS.border2, overflow: "hidden" }}>
+                                <div style={{ width: `${Math.min(100, item.minO > 0 ? Math.round((cntO/item.minO)*100) : 0)}%`, height: "100%", borderRadius: 3, background: doneO ? "#16a34a" : sp.color, transition: "width 0.35s" }} />
+                              </div>
+                            </div>
+                          )}
+                          {item.minA > 0 && (
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <span style={{ fontSize: 10, color: "#2563eb", minWidth: 14, fontWeight: 700 }}>A</span>
+                              <div style={{ flex: 1, height: 6, borderRadius: 3, background: DS.border2, overflow: "hidden" }}>
+                                <div style={{ width: `${Math.min(100, item.minA > 0 ? Math.round((cntA/item.minA)*100) : 0)}%`, height: "100%", borderRadius: 3, background: doneA ? "#2563eb" : "#93c5fd", transition: "width 0.35s" }} />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <Bar value={cnt} min={item.min} max={item.max} color={sp.color} />
+                      )}
                     </div>
                   );
                 })
@@ -1217,7 +1312,7 @@ function CasesView({ cases, onDelete }) {
           background: DS.surface, border: `1px solid ${DS.border}`,
           borderRadius: 12, padding: "13px 14px", marginBottom: 8
         }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ fontSize: 14, fontWeight: 700, color: DS.text, fontFamily: "ui-monospace, monospace" }}>
                 {c.fallnr || "—"}
