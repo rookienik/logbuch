@@ -284,51 +284,133 @@ const CATALOG = {
   },
 
   gefaess: {
-    label: "Gefässchirurgie", color: "#f43f5e", type: "flat",
-    dualRole: true, // O = V+I (Operateur/Instruierend), A = Assistenz (1. Hand)
-    roleNote: "V + I zählen als Operateur (O) · A = 1. Hand Assistenz",
+    label: "Gefässchirurgie", color: "#f43f5e", type: "gefaess",
+    dualRole: true,
+    roleNote: "V + I zählen als Operateur (O) · A = 1. Hand Assistenz · * = kompensierbar · ** = 50% endovaskulär",
     sections: [
-      { id: "gf_arterien", label: "A – Offene Chirurgie der Arterien", items: [
-        { id: "gf_1", label: "1 – Chirurgie supraaortale Äste", note: "Karotis-TEA/-Eversion · A. carotis communis · A. vertebralis · A. subclavia / Truncus brachiocephalicus", minO: 20, minA: 25 },
-        { id: "gf_2", label: "2 – Arterielle Durchblutungsstörungen obere Extremitäten **", minO: 10, minA: 10 },
-        { id: "gf_3", label: "3 – Zugangswegechirurgie Hämodialyse", note: "Cimino-Brescia · Tabatière · Brachio-cephal · Kunststoffinterponat · andere Zugangswege", minO: 20, minA: 10 },
-        { id: "gf_4a", label: "4a – Thorako-abdominales Aneurysma", minO: 3, minA: 0 },
-        { id: "gf_4b", label: "4b – Viszerale Gefässoperationen", minO: 3, minA: 0 },
-        { id: "gf_4c", label: "4c – Eingriffe Nierenarterien *", minO: 3, minA: 5 },
-        { id: "gf_4d", label: "4d – Bauchaortenaneurysma elektiv (AAA)", minO: 20, minA: 20 },
-        { id: "gf_4e", label: "4e – Bauchaortenaneurysma rupturiert", minO: 5, minA: 5 },
-        { id: "gf_4f", label: "4f – AAA + Beckenarterienaneurysma", minO: 5, minA: 5 },
-        { id: "gf_4g", label: "4g – Aorto-iliakale Verschlusskrankheit **", minO: 8, minA: 8 },
-        { id: "gf_5a", label: "5a – Extra-anatomische Umleitung", minO: 5, minA: 5 },
-        { id: "gf_5b", label: "5b – Rekonstruktionen Femoralisgabel", note: "TEA der Femoralisgabel · retrograde iliakale Ringdesobliteration · Profundaplastik", minO: 25, minA: 20 },
-        { id: "gf_6a", label: "6a – Femoro-poplitealer Bypass supragenual (max. 5)", minO: 5, minA: 5 },
-        { id: "gf_6b", label: "6b – Femoro-poplitealer Bypass infragenual", minO: 10, minA: 10 },
-        { id: "gf_6c", label: "6c – Femoro-infrapoplitealer / cruraler Bypass", minO: 10, minA: 10 },
-        { id: "gf_6d", label: "6d – Popliteo-distaler / cruraler / pedaler Bypass", note: "In situ · reversed · prothetisch mit Cuff", minO: 5, minA: 5 },
-        { id: "gf_7", label: "7 – Revaskularisation bei akuten arteriellen Verschlüssen **", minO: 20, minA: 20 },
-        { id: "gf_8a", label: "8a – Fasziotomie", minO: 5, minA: 5 },
-        { id: "gf_8b", label: "8b – Aneurysmachirurgie untere Extremitäten", minO: 5, minA: 5 },
-        { id: "gf_8c", label: "8c – Septische Gefässchirurgie", note: "Mykotische Aneurysmen · infizierte Gefässprothesen", minO: 0, minA: 5 },
-      ]},
-      { id: "gf_venen", label: "B – Chirurgie der Venen", items: [
-        { id: "gf_9", label: "9 – Venöse Thrombektomie untere Extremitäten *", note: "Ilio-femorale Thrombektomie · Vieretagenthrombektomie · temporäre AV-Fistel", minO: 5, minA: 5 },
-        { id: "gf_10", label: "10 – Rekonstruktive Eingriffe tiefes Venensystem **", note: "Cross-over Bypass · Klappenrekonstruktion · Transplantation · Transposition · traumatische Venenläsionen", minO: 5, minA: 5 },
-        { id: "gf_11a", label: "11 – Varizenchirurgie", note: "Crossektomie · Varizenkonvolut · Stripping V. saphena · Perforantenunterbrechung · Kombinationen", minO: 60, minA: 20 },
-        { id: "gf_11b", label: "11f – Endovenöse Varizeneingriffe", minO: 10, minA: 0 },
-        { id: "gf_12", label: "12 – Eingriffe postthrombotisches Syndrom", note: "Ulcusexzision mit Fasziektomie · endoskopische Perforantenligatur · paratibiale Fasziotomie", minO: 5, minA: 5 },
-      ]},
-      { id: "gf_besondere", label: "C – Besondere Eingriffe", items: [
-        { id: "gf_13", label: "13 – Amputationen", note: "Klein (Zehen, Mittelfuss) · Gross (Unterschenkel, Oberschenkel)", minO: 10, minA: 5 },
-        { id: "gf_14", label: "14 – Sympathektomien", note: "Thorakal · Lumbal", minO: 0, minA: 0 },
-        { id: "gf_15", label: "15 – Kompressionssyndrome *", note: "Thoracic outlet syndrome · Entrapment syndrome", minO: 2, minA: 4 },
-        { id: "gf_16", label: "16 – Angiodysplasien", minO: 0, minA: 0 },
-        { id: "gf_17", label: "17 – Erkrankungen Lymphabfluss", minO: 0, minA: 0 },
-      ]},
-      { id: "gf_endovasc", label: "D – Endovaskuläre Eingriffe", note: "Auch bei Kombinationseingriffen anrechenbar · * = kompensierbar · ** = 50% durch endovaskuläre OPs", items: [
-        { id: "gf_18", label: "18 – Angiographie (arteriell + venös)", minO: 30, minA: 20 },
-        { id: "gf_19", label: "19 – Angioplastie / Stent / Katheterthrombektomie / Lyse / Hybrid", minO: 30, minA: 20 },
-        { id: "gf_20", label: "20 – Stent-Graft Aorta", minO: 10, minA: 10 },
-      ]},
+      { id: "gf_A", label: "A – Offene Chirurgie der Arterien",
+        groups: [
+          { id: "gf_1", label: "1 – Chirurgie der supraaortalen Äste", minO: 20, minA: 25,
+            subs: [
+              { id: "gf_1a", label: "a – Thrombendarterektomie / Eversionsendarterektomie Karotis-Bifurkation" },
+              { id: "gf_1b", label: "b – Rekonstruktion der A. carotis communis" },
+              { id: "gf_1c", label: "c – Eingriffe an der A. vertebralis" },
+              { id: "gf_1d", label: "d – Eingriffe bei symptomatischem Verschluss A. subclavia / Truncus brachiocephalicus" },
+            ]
+          },
+          { id: "gf_2", label: "2 – Arterielle Durchblutungsstörungen obere Extremitäten **", minO: 10, minA: 10, subs: [] },
+          { id: "gf_3", label: "3 – Zugangswegechirurgie für Hämodialyse-Patienten", minO: 20, minA: 10,
+            subs: [
+              { id: "gf_3a", label: "a – Radio-cephale Fistel (Cimino-Brescia Fistel)" },
+              { id: "gf_3b", label: "b – Tabatière" },
+              { id: "gf_3c", label: "c – Brachio-cephale Fistel / Kunststoff- oder Bioprothese / autologes Veneninterponat" },
+              { id: "gf_3d", label: "d – Andere Zugangswege (inkl. tunnelierte Dauerkatheter)" },
+            ]
+          },
+          { id: "gf_4", label: "4 – Eingriffe der Aorta sowie der Viszeral- und Beckenarterien", minO: 36, minA: 44,
+            subs: [
+              { id: "gf_4a", label: "a – Thorako-abdominales Aneurysma", minO: 0, minA: 3 },
+              { id: "gf_4b", label: "b – Viszerale Gefässoperationen (Pfortader nicht inbegriffen)", minO: 0, minA: 3 },
+              { id: "gf_4c", label: "c – Eingriffe an den Nierenarterien *", minO: 3, minA: 5 },
+              { id: "gf_4d", label: "d – Bauchaortenaneurysma elektiv (AAA)", minO: 20, minA: 20 },
+              { id: "gf_4e", label: "e – Bauchaortenaneurysma rupturiert", minO: 5, minA: 5 },
+              { id: "gf_4f", label: "f – AAA + Beckenarterienaneurysma", minO: 5, minA: 5 },
+              { id: "gf_4g", label: "g – Aorto-iliakale Verschlusskrankheit **", minO: 8, minA: 8 },
+            ]
+          },
+          { id: "gf_5", label: "5 – Rekonstruktive Eingriffe im Bereich der Leiste", minO: 30, minA: 25,
+            subs: [
+              { id: "gf_5a", label: "a – Extra-anatomische Umleitung", minO: 5, minA: 5 },
+              { id: "gf_5b", label: "b – Rekonstruktionen im Bereich der Femoralisgabel", note: "TEA · retrograde iliakale Ringdesobliteration · Profundaplastik", minO: 25, minA: 20 },
+            ]
+          },
+          { id: "gf_6", label: "6 – Infrainguinale Rekonstruktionen bei PAVK **", minO: 30, minA: 30,
+            subs: [
+              { id: "gf_6a", label: "a – Femoro-poplitealer Bypass supragenual (max. 5 anrechenbar)", minO: 5, minA: 5 },
+              { id: "gf_6b", label: "b – Femoro-poplitealer Bypass infragenual", minO: 10, minA: 10 },
+              { id: "gf_6c", label: "c – Femoro-infrapoplitealer / cruraler Bypass", minO: 10, minA: 10 },
+              { id: "gf_6d", label: "d – Popliteo-distaler / cruraler / pedaler Bypass", note: "in situ · reversed · prothetisch mit Cuff", minO: 5, minA: 5 },
+            ]
+          },
+          { id: "gf_7", label: "7 – Revaskularisation bei akuten arteriellen Verschlüssen **", minO: 20, minA: 20, subs: [] },
+          { id: "gf_8", label: "8 – Varia", minO: 10, minA: 15,
+            subs: [
+              { id: "gf_8a", label: "a – Fasziotomie", minO: 5, minA: 5 },
+              { id: "gf_8b", label: "b – Aneurysmachirurgie der unteren Extremitäten", minO: 5, minA: 5 },
+              { id: "gf_8c", label: "c – Septische Gefässchirurgie (mykotische Aneurysmen, infizierte Prothesen)", minO: 0, minA: 5 },
+            ]
+          },
+        ]
+      },
+      { id: "gf_B", label: "B – Chirurgie der Venen",
+        groups: [
+          { id: "gf_9", label: "9 – Venöse Thrombektomie untere Extremitäten *", minO: 5, minA: 5,
+            subs: [
+              { id: "gf_9a", label: "a – Ilio-femorale Thrombektomie" },
+              { id: "gf_9b", label: "b – Vieretagenthrombektomie" },
+              { id: "gf_9c", label: "c – Temporäre arterio-venöse Fistel" },
+            ]
+          },
+          { id: "gf_10", label: "10 – Rekonstruktive Eingriffe am tiefen Venensystem **", minO: 5, minA: 5,
+            subs: [
+              { id: "gf_10a", label: "a – Cross-over Bypass bei Beckenvenensperre (Palma-Esperon / Cockett)" },
+              { id: "gf_10b", label: "b – Rekonstruktion von Klappen am tiefen Venensystem" },
+              { id: "gf_10c", label: "c – Transplantation / Transfer klappentragender Venensegmente" },
+              { id: "gf_10d", label: "d – Venen-Transposition" },
+              { id: "gf_10e", label: "e – Behandlung traumatischer Venenläsionen" },
+            ]
+          },
+          { id: "gf_11", label: "11 – Varizenchirurgie", minO: 60, minA: 20,
+            subs: [
+              { id: "gf_11a", label: "a – Crossektomie" },
+              { id: "gf_11b", label: "b – Varizenkonvolutausräumung" },
+              { id: "gf_11c", label: "c – Stripping der V. saphena magna und/oder parva" },
+              { id: "gf_11d", label: "d – Perforantenunterbrechung" },
+              { id: "gf_11e", label: "e – Kombination von a–d" },
+              { id: "gf_11f", label: "f – Endovenöse Varizeneingriffe", minO: 10, minA: 0 },
+            ]
+          },
+          { id: "gf_12", label: "12 – Eingriffe bei postthrombotischem Syndrom", minO: 5, minA: 5,
+            subs: [
+              { id: "gf_12a", label: "a – Ulcusexzision mit Fasziektomie und plastischer Deckung" },
+              { id: "gf_12b", label: "b – Endoskopische Ligatur von Vv. Perforantes" },
+              { id: "gf_12c", label: "c – Endoskopische paratibiale Fasziotomie" },
+            ]
+          },
+        ]
+      },
+      { id: "gf_C", label: "C – Besondere Eingriffe",
+        groups: [
+          { id: "gf_13", label: "13 – Amputationen", minO: 10, minA: 5,
+            subs: [
+              { id: "gf_13a", label: "a – Kleine Amputationen (Zehen, Mittelfuss)" },
+              { id: "gf_13b", label: "b – Grosse Amputationen (Unterschenkel / Oberschenkel)" },
+            ]
+          },
+          { id: "gf_14", label: "14 – Indirekt hyperämisierende Massnahmen – Sympathektomien", minO: 0, minA: 0,
+            subs: [
+              { id: "gf_14a", label: "a – Thorakale Sympathektomie" },
+              { id: "gf_14b", label: "b – Lumbale Sympathektomie" },
+            ]
+          },
+          { id: "gf_15", label: "15 – Operationen bei Kompressionssyndromen *", minO: 2, minA: 4,
+            subs: [
+              { id: "gf_15a", label: "a – Thoracic outlet syndrome" },
+              { id: "gf_15b", label: "b – Entrapment syndrome" },
+            ]
+          },
+          { id: "gf_16", label: "16 – Eingriffe bei Angiodysplasie", minO: 0, minA: 0, subs: [] },
+          { id: "gf_17", label: "17 – Operative Behandlung bei Erkrankungen des Lymphabflusses", minO: 0, minA: 0, subs: [] },
+        ]
+      },
+      { id: "gf_D", label: "D – Endovaskuläre Eingriffe",
+        note: "Auch bei Kombinationseingriffen anrechenbar",
+        groups: [
+          { id: "gf_18", label: "18 – Angiographie (arteriell u. venös)", minO: 30, minA: 20, subs: [] },
+          { id: "gf_19", label: "19 – Angioplastie / Stent / Katheterthrombektomie / Lyse / Hybrid-Eingriffe", minO: 30, minA: 20, subs: [] },
+          { id: "gf_20", label: "20 – Stent-Graft in der Aorta", minO: 10, minA: 10, subs: [] },
+        ]
+      },
     ]
   }
 
@@ -339,9 +421,15 @@ const CATALOG = {
 const ALL_ITEMS = {};
 Object.entries(CATALOG).forEach(([spId, sp]) => {
   sp.sections.forEach(sec => {
-    const items = sp.type === "hierarchical"
-      ? sec.regions.flatMap(r => r.items)
-      : sec.items;
+    let items = [];
+    if (sp.type === "hierarchical") {
+      items = sec.regions.flatMap(r => r.items);
+    } else if (sp.type === "gefaess") {
+      // gefaess: group IDs are the primary taggable items; subs are for display only
+      items = sec.groups.map(g => ({ id: g.id, label: g.label, minO: g.minO, minA: g.minA, note: g.note }));
+    } else {
+      items = sec.items;
+    }
     items.forEach(item => {
       ALL_ITEMS[item.id] = { ...item, specialty: spId, sectionId: sec.id, sectionLabel: sec.label, specialtyLabel: sp.label, dualRole: !!sp.dualRole };
     });
@@ -493,8 +581,8 @@ function RolePill({ role }) {
   );
 }
 
-function Bar({ value, min, max, color }) {
-  if (!min && !max) return null;
+function Bar({ value, min, max, color, alwaysShow }) {
+  if (!min && !max && !alwaysShow) return null;
   const target = min || max;
   const pct = Math.min(100, target > 0 ? Math.round((value / target) * 100) : 0);
   const done = min ? value >= min : false;
@@ -688,6 +776,169 @@ function OrthoTagPicker({ sp, tags, onToggle, search }) {
   );
 }
 
+
+// ─── GEFÄSSCHIRURGIE TAG PICKER (3 levels: Section → Group → Sub-items) ──────
+
+function GefaessTagPicker({ sp, tags, onToggle, search }) {
+  const [openSec, setOpenSec] = useState(null);
+  const [openGrp, setOpenGrp] = useState(null);
+  const color = sp.color;
+
+  const filteredSections = useMemo(() => {
+    if (!search) return sp.sections;
+    const q = search.toLowerCase();
+    return sp.sections.map(sec => ({
+      ...sec,
+      groups: sec.groups.map(grp => ({
+        ...grp,
+        subs: (grp.subs || []).filter(s =>
+          s.label.toLowerCase().includes(q) ||
+          grp.label.toLowerCase().includes(q) ||
+          sec.label.toLowerCase().includes(q)
+        ),
+        _matches: grp.label.toLowerCase().includes(q) || sec.label.toLowerCase().includes(q)
+      })).filter(grp => grp._matches || grp.subs.length > 0)
+    })).filter(sec => sec.groups.length > 0);
+  }, [search, sp.sections]);
+
+  if (search) {
+    return (
+      <div>
+        {filteredSections.map(sec => (
+          <div key={sec.id} style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color, marginBottom: 8, letterSpacing: "0.1em", textTransform: "uppercase" }}>{sec.label}</div>
+            {sec.groups.map(grp => {
+              const selected = tags.includes(grp.id);
+              return (
+                <div key={grp.id} style={{ marginBottom: 8, paddingLeft: 8 }}>
+                  <button onClick={() => onToggle(grp.id)} style={{
+                    display: "flex", alignItems: "baseline", gap: 10,
+                    width: "100%", textAlign: "left", padding: "9px 12px", marginBottom: 4,
+                    borderRadius: 8, border: `1.5px solid ${selected ? color : DS.border}`,
+                    background: selected ? color + "12" : DS.surface,
+                    color: DS.text, cursor: "pointer", fontSize: 13, transition: "all 0.12s",
+                  }}>
+                    <span style={{ width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+                      border: `2px solid ${selected ? color : DS.border2}`,
+                      background: selected ? color : "transparent",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 9, color: "#fff" }}>{selected ? "✓" : ""}</span>
+                    <span style={{ fontWeight: 600 }}>{grp.label}</span>
+                  </button>
+                  {grp.subs.map(sub => (
+                    <div key={sub.id} style={{ paddingLeft: 28, marginBottom: 2,
+                      fontSize: 12, color: DS.textMuted }}>• {sub.label}</div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {sp.sections.map(sec => {
+        const isSecOpen = openSec === sec.id;
+        const selCount = sec.groups.filter(g => tags.includes(g.id)).length;
+        return (
+          <div key={sec.id} style={{ marginBottom: 4 }}>
+            {/* Level 1: Section (A/B/C/D) */}
+            <button onClick={() => { setOpenSec(isSecOpen ? null : sec.id); setOpenGrp(null); }} style={{
+              width: "100%", padding: "11px 14px", borderRadius: 10,
+              border: `1px solid ${isSecOpen ? color + "60" : DS.border}`,
+              background: isSecOpen ? color + "12" : DS.surface,
+              color: isSecOpen ? DS.text : DS.textMuted,
+              cursor: "pointer", textAlign: "left",
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              transition: "all 0.15s"
+            }}>
+              <span style={{ fontSize: 13, fontWeight: 700 }}>{sec.label}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {selCount > 0 && (
+                  <span style={{ fontSize: 11, background: color + "30", color, borderRadius: 10, padding: "1px 8px", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>
+                    {selCount}
+                  </span>
+                )}
+                <span style={{ color: DS.textMuted, fontSize: 13 }}>{isSecOpen ? "▾" : "▸"}</span>
+              </div>
+            </button>
+
+            {isSecOpen && (
+              <div style={{ paddingLeft: 10, paddingTop: 4, paddingBottom: 4 }}>
+                {sec.groups.map(grp => {
+                  const isGrpOpen = openGrp === grp.id;
+                  const selected = tags.includes(grp.id);
+                  const hasSubs = grp.subs && grp.subs.length > 0;
+                  return (
+                    <div key={grp.id} style={{ marginBottom: 3 }}>
+                      {/* Level 2: Numbered item */}
+                      <div style={{ display: "flex", gap: 6, alignItems: "stretch" }}>
+                        {/* Checkbox */}
+                        <button onClick={() => onToggle(grp.id)} style={{
+                          width: 36, flexShrink: 0, borderRadius: 8,
+                          border: `1.5px solid ${selected ? color : DS.border}`,
+                          background: selected ? color + "15" : DS.surface2,
+                          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                          transition: "all 0.12s",
+                        }}>
+                          <span style={{ width: 16, height: 16, borderRadius: 4,
+                            border: `2px solid ${selected ? color : DS.border2}`,
+                            background: selected ? color : "transparent",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 9, color: "#fff" }}>{selected ? "✓" : ""}</span>
+                        </button>
+                        {/* Label + expand */}
+                        <button onClick={() => hasSubs && setOpenGrp(isGrpOpen ? null : grp.id)} style={{
+                          flex: 1, padding: "9px 10px", borderRadius: 8,
+                          border: `1px solid ${isGrpOpen ? color + "40" : DS.border2}`,
+                          background: isGrpOpen ? color + "0a" : DS.surface2,
+                          color: DS.text, cursor: hasSubs ? "pointer" : "default",
+                          textAlign: "left", display: "flex", justifyContent: "space-between",
+                          alignItems: "baseline", transition: "all 0.12s",
+                        }}>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: 12, fontWeight: 600 }}>{grp.label}</span>
+                            {grp.note && <div style={{ fontSize: 10, color: DS.textDim, marginTop: 2 }}>{grp.note}</div>}
+                            <div style={{ display: "flex", gap: 8, marginTop: 3 }}>
+                              {grp.minO > 0 && <span style={{ fontSize: 10, color: "#16a34a", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>O:{grp.minO}</span>}
+                              {grp.minA > 0 && <span style={{ fontSize: 10, color: "#2563eb", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>A:{grp.minA}</span>}
+                            </div>
+                          </div>
+                          {hasSubs && <span style={{ color: DS.textDim, fontSize: 11, flexShrink: 0, marginLeft: 8 }}>{isGrpOpen ? "▾" : "▸"}</span>}
+                        </button>
+                      </div>
+
+                      {/* Level 3: Lettered sub-items (display only, informational) */}
+                      {isGrpOpen && hasSubs && (
+                        <div style={{ paddingLeft: 46, paddingTop: 4, paddingBottom: 4 }}>
+                          {grp.subs.map(sub => (
+                            <div key={sub.id} style={{
+                              padding: "5px 8px", marginBottom: 2, borderRadius: 6,
+                              background: DS.surface2, border: `1px solid ${DS.border}`,
+                              fontSize: 12, color: DS.textMuted, display: "flex", alignItems: "baseline", gap: 8,
+                            }}>
+                              <span style={{ flex: 1 }}>{sub.label}</span>
+                              {sub.minO > 0 && <span style={{ fontSize: 10, color: "#16a34a", fontFamily: "ui-monospace, monospace", fontWeight: 700, flexShrink: 0 }}>O:{sub.minO}</span>}
+                              {sub.minA > 0 && <span style={{ fontSize: 10, color: "#2563eb", fontFamily: "ui-monospace, monospace", fontWeight: 700, flexShrink: 0 }}>A:{sub.minA}</span>}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── FLAT PICKER (Chirurgie / Hand) ───────────────────────────────────────────
 
 function FlatTagPicker({ sp, tags, onToggle, search }) {
@@ -862,7 +1113,10 @@ function AddCaseView({ onSave }) {
       const allItems = sp.type === "hierarchical"
         ? sp.sections.flatMap(s => s.regions?.flatMap(r => r.items) || [])
         : sp.sections.flatMap(s => s.items);
-      result[spId] = allItems.filter(i => tags.includes(i.id)).length;
+      const tagIds = sp.type === "gefaess"
+        ? sp.sections.flatMap(s => s.groups.map(g => g.id))
+        : allItems.map(i => i.id);
+      result[spId] = tagIds.filter(id => tags.includes(id)).length;
     });
     return result;
   }, [tags]);
@@ -974,6 +1228,8 @@ function AddCaseView({ onSave }) {
           <div style={{ maxHeight: "38vh", overflowY: "auto", paddingRight: 2 }}>
             {CATALOG[activeSpec].type === "hierarchical"
               ? <OrthoTagPicker sp={CATALOG[activeSpec]} tags={tags} onToggle={toggleTag} search={search} />
+              : CATALOG[activeSpec].type === "gefaess"
+              ? <GefaessTagPicker sp={CATALOG[activeSpec]} tags={tags} onToggle={toggleTag} search={search} />
               : <FlatTagPicker sp={CATALOG[activeSpec]} tags={tags} onToggle={toggleTag} search={search} />
             }
           </div>
@@ -1040,9 +1296,13 @@ function ProgressView({ cases }) {
         const isRegional = !!sec.regional;
         const allItems = sp.type === "hierarchical"
           ? sec.regions.flatMap(r => r.items)
+          : sp.type === "gefaess"
+          ? sec.groups
           : sec.items;
-        const secMin = sec.sectionMin || sec.min;
-        const secTotal = allItems.reduce((s, i) => s + getCount(i, isRegional), 0);
+        const secMin = sec.sectionMin || sec.min || 0;
+        const secTotal = sp.type === "gefaess"
+          ? allItems.reduce((s, g) => s + (counts[g.id] ? counts[g.id].V + counts[g.id].I : 0), 0)
+          : allItems.reduce((s, i) => s + getCount(i, isRegional), 0);
         const secDone = secMin ? secTotal >= secMin : false;
         const secColor = isRegional ? "#f59e0b" : sp.color;
 
@@ -1081,7 +1341,58 @@ function ProgressView({ cases }) {
 
             {/* Items */}
             <div style={{ padding: "10px 14px 12px" }}>
-              {sp.type === "hierarchical"
+              {sp.type === "gefaess"
+                ? sec.groups.map(grp => {
+                  const rawC = counts[grp.id] || { V: 0, I: 0, A: 0 };
+                  const cntO = rawC.V + rawC.I;
+                  const cntA = rawC.A;
+                  const doneO = grp.minO > 0 ? cntO >= grp.minO : true;
+                  const doneA = grp.minA > 0 ? cntA >= grp.minA : true;
+                  const done = doneO && doneA;
+                  return (
+                    <div key={grp.id} style={{ marginBottom: 14 }}>
+                      {/* Group header */}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, marginBottom: 4 }}>
+                        <span style={{ fontSize: 13, color: done ? DS.textMuted : DS.text, fontWeight: 600, lineHeight: 1.4, flex: 1 }}>
+                          {grp.label}
+                        </span>
+                        <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                          {grp.minO > 0 && <span style={{ fontSize: 11, fontFamily: "ui-monospace, monospace", fontWeight: 700, color: doneO ? "#16a34a" : DS.textMuted }}>O:{cntO}/{grp.minO}</span>}
+                          {grp.minA > 0 && <span style={{ fontSize: 11, fontFamily: "ui-monospace, monospace", fontWeight: 700, color: doneA ? "#2563eb" : DS.textMuted }}>A:{cntA}/{grp.minA}</span>}
+                        </div>
+                      </div>
+                      {grp.note && <div style={{ fontSize: 11, color: DS.textDim, marginBottom: 4 }}>{grp.note}</div>}
+                      {/* Dual bars — always show */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <span style={{ fontSize: 10, color: "#16a34a", minWidth: 14, fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>O</span>
+                          <div style={{ flex: 1, height: 6, borderRadius: 3, background: DS.border2, overflow: "hidden" }}>
+                            <div style={{ width: `${grp.minO > 0 ? Math.min(100, Math.round((cntO/grp.minO)*100)) : 0}%`, height: "100%", borderRadius: 3, background: doneO ? "#16a34a" : sp.color, transition: "width 0.35s" }} />
+                          </div>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <span style={{ fontSize: 10, color: "#2563eb", minWidth: 14, fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>A</span>
+                          <div style={{ flex: 1, height: 6, borderRadius: 3, background: DS.border2, overflow: "hidden" }}>
+                            <div style={{ width: `${grp.minA > 0 ? Math.min(100, Math.round((cntA/grp.minA)*100)) : 0}%`, height: "100%", borderRadius: 3, background: doneA ? "#2563eb" : "#93c5fd", transition: "width 0.35s" }} />
+                          </div>
+                        </div>
+                      </div>
+                      {/* Sub-items (display only) */}
+                      {grp.subs && grp.subs.length > 0 && (
+                        <div style={{ marginTop: 6, paddingLeft: 20, borderLeft: `2px solid ${DS.border}` }}>
+                          {grp.subs.map(sub => (
+                            <div key={sub.id} style={{ fontSize: 11, color: DS.textDim, padding: "2px 0" }}>
+                              {sub.label}
+                              {sub.minO > 0 && <span style={{ fontFamily: "ui-monospace, monospace", color: "#16a34a", marginLeft: 8, fontWeight: 700 }}>O:{sub.minO}</span>}
+                              {sub.minA > 0 && <span style={{ fontFamily: "ui-monospace, monospace", color: "#2563eb", marginLeft: 6, fontWeight: 700 }}>A:{sub.minA}</span>}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+                : sp.type === "hierarchical"
                 ? sec.regions.map(reg => {
                   const regItems = reg.items;
                   const regTotal = regItems.reduce((s, i) => s + getCount(i, isRegional), 0);
