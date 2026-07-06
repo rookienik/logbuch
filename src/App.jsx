@@ -530,6 +530,16 @@ async function deleteCase(id) {
   } catch (e) { console.error("Delete error:", e); }
 }
 
+async function updateCase(entry) {
+  try {
+    const { error } = await supabase
+      .from("cases")
+      .update({ fallnr: entry.fallnr, date: entry.date, role: entry.role, note: entry.note, tags: JSON.stringify(entry.tags) })
+      .eq("id", entry.id);
+    if (error) throw error;
+  } catch (e) { console.error("Update error:", e); }
+}
+
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
 function today() { return new Date().toISOString().slice(0, 10); }
@@ -1658,10 +1668,213 @@ function exportCSV(cases) {
   URL.revokeObjectURL(url);
 }
 
+
+// ─── EDIT SHEET ───────────────────────────────────────────────────────────────
+
+function EditSheet({ caseEntry, onSave, onClose }) {
+  const [step, setStep] = useState(1);
+  const [fallnr, setFallnr] = useState(caseEntry.fallnr || "");
+  const [date, setDate] = useState(caseEntry.date || today());
+  const [role, setRole] = useState(caseEntry.role || "V");
+  const [note, setNote] = useState(caseEntry.note || "");
+  const [tags, setTags] = useState(caseEntry.tags || []);
+  const [search, setSearch] = useState("");
+  const [activeSpec, setActiveSpec] = useState("chirurgie");
+  const [saving, setSaving] = useState(false);
+
+  const toggleTag = useCallback((id) => {
+    setTags(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    await onSave({ ...caseEntry, fallnr, date, role, note, tags });
+    setSaving(false);
+    onClose();
+  };
+
+  const spSelCounts = useMemo(() => {
+    const result = {};
+    Object.entries(CATALOG).forEach(([spId, sp]) => {
+      const allItems = sp.type === "hierarchical"
+        ? sp.sections.flatMap(s => s.regions?.flatMap(r => r.items) || [])
+        : sp.type === "gefaess"
+        ? sp.sections.flatMap(s => s.groups.map(g => ({ id: g.id })))
+        : sp.sections.flatMap(s => s.items);
+      const tagIds = sp.type === "gefaess"
+        ? sp.sections.flatMap(s => s.groups.map(g => g.id))
+        : allItems.map(i => i.id);
+      result[spId] = tagIds.filter(id => tags.includes(id)).length;
+    });
+    return result;
+  }, [tags]);
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div onClick={onClose} style={{
+        position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)",
+        zIndex: 50, backdropFilter: "blur(2px)"
+      }} />
+
+      {/* Sheet */}
+      <div style={{
+        position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 51,
+        background: DS.surface, borderRadius: "18px 18px 0 0",
+        boxShadow: "0 -4px 40px rgba(0,0,0,0.15)",
+        maxHeight: "92vh", display: "flex", flexDirection: "column",
+      }}>
+        {/* Handle */}
+        <div style={{ display: "flex", justifyContent: "center", padding: "10px 0 0" }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: DS.border2 }} />
+        </div>
+
+        {/* Header */}
+        <div style={{
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          padding: "10px 20px 12px", borderBottom: `1px solid ${DS.border}`
+        }}>
+          <span style={{ fontSize: 16, fontWeight: 700, color: DS.text }}>Eingriff bearbeiten</span>
+          <button onClick={onClose} style={{
+            background: DS.surface2, border: "none", borderRadius: "50%",
+            width: 30, height: 30, cursor: "pointer", fontSize: 16,
+            color: DS.textMuted, display: "flex", alignItems: "center", justifyContent: "center"
+          }}>×</button>
+        </div>
+
+        {/* Step tabs */}
+        <div style={{ display: "flex", gap: 6, padding: "10px 20px 0" }}>
+          {[1, 2].map(s => (
+            <div key={s} onClick={() => setStep(s)} style={{
+              flex: 1, height: 3, borderRadius: 2, cursor: "pointer",
+              background: step >= s ? "#2563eb" : DS.border2, transition: "background 0.2s"
+            }} />
+          ))}
+        </div>
+
+        {/* Content */}
+        <div style={{ overflowY: "auto", flex: 1, padding: "16px 20px 32px" }}>
+          {step === 1 && (
+            <div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={labelStyle}>Fallnummer</label>
+                <input value={fallnr} onChange={e => setFallnr(e.target.value)}
+                  placeholder="z.B. 13224607" style={inputStyle} />
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={labelStyle}>Datum</label>
+                <input type="date" value={date} onChange={e => setDate(e.target.value)} style={inputStyle} />
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={labelStyle}>Funktion</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  {["V", "I", "A"].map(r => (
+                    <button key={r} onClick={() => setRole(r)} style={{
+                      flex: 1, padding: "12px 0", borderRadius: 10, border: "none", cursor: "pointer",
+                      fontWeight: 700, fontSize: 14,
+                      background: role === r ? ROLE_COLORS[r] + "25" : DS.surface2,
+                      color: role === r ? ROLE_COLORS[r] : DS.textMuted,
+                      outline: role === r ? `2px solid ${ROLE_COLORS[r]}80` : "none",
+                      transition: "all 0.15s"
+                    }}>
+                      {r}
+                      <div style={{ fontSize: 10, fontWeight: 400, marginTop: 2, opacity: 0.7 }}>
+                        {ROLE_LABELS[r].slice(0, 12)}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={labelStyle}>Freitext (optional)</label>
+                <textarea value={note} onChange={e => setNote(e.target.value)}
+                  placeholder="z.B. Diagnose, Besonderheiten…" rows={2}
+                  style={{ ...inputStyle, resize: "none" }} />
+              </div>
+              <button onClick={() => setStep(2)} style={{
+                width: "100%", padding: "13px", borderRadius: 10, border: "none",
+                background: "#2563eb", color: "#fff", cursor: "pointer",
+                fontSize: 14, fontWeight: 700,
+              }}>Kategorien bearbeiten →</button>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: DS.text }}>Kategorien</span>
+                <span style={{ fontSize: 12, color: "#2563eb", fontFamily: "ui-monospace, monospace", fontWeight: 600 }}>
+                  {tags.length} gewählt
+                </span>
+              </div>
+
+              {/* Specialty tabs */}
+              <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
+                {Object.entries(CATALOG).map(([id, s]) => (
+                  <button key={id} onClick={() => setActiveSpec(id)} style={{
+                    flex: 1, minWidth: 70, padding: "7px 4px", borderRadius: 8, border: "none", cursor: "pointer",
+                    fontWeight: 600, fontSize: 11,
+                    background: activeSpec === id ? s.color + "25" : DS.surface2,
+                    color: activeSpec === id ? s.color : DS.textMuted,
+                    outline: activeSpec === id ? `1.5px solid ${s.color}60` : "none",
+                    transition: "all 0.15s", position: "relative"
+                  }}>
+                    {s.label.split(" / ")[0]}
+                    {spSelCounts[id] > 0 && (
+                      <span style={{
+                        position: "absolute", top: -5, right: -2,
+                        background: s.color, color: "#fff",
+                        borderRadius: 8, fontSize: 9, fontWeight: 800,
+                        padding: "1px 5px", fontFamily: "ui-monospace, monospace"
+                      }}>{spSelCounts[id]}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <input value={search} onChange={e => setSearch(e.target.value)}
+                placeholder="Suchen…" style={{ ...inputStyle, marginBottom: 10 }} />
+
+              <div style={{ maxHeight: "35vh", overflowY: "auto" }}>
+                {CATALOG[activeSpec].type === "hierarchical"
+                  ? <OrthoTagPicker sp={CATALOG[activeSpec]} tags={tags} onToggle={toggleTag} search={search} />
+                  : CATALOG[activeSpec].type === "gefaess"
+                  ? <GefaessTagPicker sp={CATALOG[activeSpec]} tags={tags} onToggle={toggleTag} search={search} />
+                  : <FlatTagPicker sp={CATALOG[activeSpec]} tags={tags} onToggle={toggleTag} search={search} />
+                }
+              </div>
+              <RegionFollowUpPicker tags={tags} onToggle={toggleTag} />
+
+              <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+                <button onClick={() => setStep(1)} style={{
+                  flex: 1, padding: "13px", borderRadius: 10,
+                  border: `1px solid ${DS.border}`, background: "transparent",
+                  color: DS.textMuted, cursor: "pointer", fontSize: 14, fontWeight: 600
+                }}>← Zurück</button>
+                <button onClick={handleSave} disabled={saving} style={{
+                  flex: 2, padding: "13px", borderRadius: 10, border: "none",
+                  background: saving ? DS.surface2 : "#2563eb",
+                  color: saving ? DS.textDim : "#fff",
+                  cursor: saving ? "not-allowed" : "pointer",
+                  fontSize: 14, fontWeight: 700, transition: "all 0.2s"
+                }}>
+                  {saving ? "Speichert…" : "Speichern"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ─── CASES VIEW ───────────────────────────────────────────────────────────────
 
-function CasesView({ cases, onDelete }) {
+function CasesView({ cases, onDelete, onEdit }) {
   const [filter, setFilter] = useState("");
+  const [editingCase, setEditingCase] = useState(null);
+  const [swipedId, setSwipedId] = useState(null);
   const sorted = useMemo(() => [...cases].sort((a, b) => b.date.localeCompare(a.date)), [cases]);
   const filtered = useMemo(() => {
     if (!filter) return sorted;
@@ -1708,43 +1921,99 @@ function CasesView({ cases, onDelete }) {
           Noch keine Eingriffe erfasst
         </div>
       )}
-      {filtered.map(c => (
-        <div key={c.id} style={{
-          background: DS.surface, border: `1px solid ${DS.border}`,
-          borderRadius: 12, padding: "13px 14px", marginBottom: 8
-        }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: DS.text, fontFamily: "ui-monospace, monospace" }}>
-                {c.fallnr || "—"}
-              </span>
-              <span style={{ fontSize: 12, color: DS.textMuted }}>{formatDate(c.date)}</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <RolePill role={c.role} />
-              <button onClick={() => onDelete(c.id)} style={{
-                background: "none", border: "none", color: DS.textDim,
-                cursor: "pointer", fontSize: 18, padding: "0 2px", lineHeight: 1
+      {filtered.map(c => {
+        const isSwiped = swipedId === c.id;
+        return (
+          <div key={c.id} style={{ position: "relative", marginBottom: 8, borderRadius: 12, overflow: "hidden" }}>
+            {/* Action buttons revealed on swipe */}
+            <div style={{
+              position: "absolute", right: 0, top: 0, bottom: 0,
+              display: "flex", alignItems: "stretch",
+              opacity: isSwiped ? 1 : 0,
+              transition: "opacity 0.15s",
+              pointerEvents: isSwiped ? "auto" : "none",
+            }}>
+              <button onClick={() => { setSwipedId(null); setEditingCase(c); }} style={{
+                background: "#2563eb", border: "none", cursor: "pointer",
+                padding: "0 18px", color: "#fff", fontSize: 13, fontWeight: 700,
+              }}>✎ Edit</button>
+              <button onClick={() => { setSwipedId(null); onDelete(c.id); }} style={{
+                background: "#dc2626", border: "none", cursor: "pointer",
+                padding: "0 14px", color: "#fff", fontSize: 18,
               }}>×</button>
             </div>
+
+            {/* Card — slides left on swipe */}
+            <div
+              style={{
+                background: DS.surface, border: `1px solid ${DS.border}`,
+                borderRadius: 12, padding: "13px 14px",
+                transform: isSwiped ? "translateX(-110px)" : "translateX(0)",
+                transition: "transform 0.2s ease",
+                position: "relative", zIndex: 1,
+                cursor: "pointer",
+              }}
+              onTouchStart={e => { e._startX = e.touches[0].clientX; }}
+              onTouchEnd={e => {
+                const dx = e.changedTouches[0].clientX - (e._startX || 0);
+                if (dx < -50) { setSwipedId(c.id); }
+                else if (dx > 20) { setSwipedId(null); }
+              }}
+              onClick={() => { if (isSwiped) { setSwipedId(null); } }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: DS.text, fontFamily: "ui-monospace, monospace" }}>
+                    {c.fallnr || "—"}
+                  </span>
+                  <span style={{ fontSize: 12, color: DS.textMuted }}>{formatDate(c.date)}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <RolePill role={c.role} />
+                  {/* Edit icon for non-touch */}
+                  <button
+                    onClick={e => { e.stopPropagation(); setEditingCase(c); }}
+                    title="Bearbeiten"
+                    style={{
+                      background: "none", border: "none", color: DS.textDim,
+                      cursor: "pointer", fontSize: 14, padding: "0 2px", lineHeight: 1,
+                    }}>✎</button>
+                  <button
+                    onClick={e => { e.stopPropagation(); onDelete(c.id); }}
+                    style={{
+                      background: "none", border: "none", color: DS.textDim,
+                      cursor: "pointer", fontSize: 18, padding: "0 2px", lineHeight: 1
+                    }}>×</button>
+                </div>
+              </div>
+              {c.note && <div style={{ fontSize: 12, color: DS.textMuted, marginBottom: 7 }}>{c.note}</div>}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                {c.tags.map(t => {
+                  const item = ALL_ITEMS[t];
+                  if (!item) return null;
+                  const color = CATALOG[item.specialty]?.color || "#60a5fa";
+                  return (
+                    <span key={t} style={{
+                      fontSize: 10, padding: "3px 8px", borderRadius: 6,
+                      background: color + "18", color, border: `1px solid ${color}30`,
+                      lineHeight: 1.4
+                    }}>{item.label}</span>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-          {c.note && <div style={{ fontSize: 12, color: DS.textMuted, marginBottom: 7 }}>{c.note}</div>}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-            {c.tags.map(t => {
-              const item = ALL_ITEMS[t];
-              if (!item) return null;
-              const color = CATALOG[item.specialty]?.color || "#60a5fa";
-              return (
-                <span key={t} style={{
-                  fontSize: 10, padding: "3px 8px", borderRadius: 6,
-                  background: color + "18", color, border: `1px solid ${color}30`,
-                  lineHeight: 1.4
-                }}>{item.label}</span>
-              );
-            })}
-          </div>
-        </div>
-      ))}
+        );
+      })}
+
+      {/* Edit sheet */}
+      {editingCase && (
+        <EditSheet
+          caseEntry={editingCase}
+          onSave={onEdit}
+          onClose={() => setEditingCase(null)}
+        />
+      )}
     </div>
   );
 }
@@ -1768,6 +2037,11 @@ export default function App() {
   const handleDelete = useCallback(async (id) => {
     await deleteCase(id);
     setCases(prev => prev.filter(c => c.id !== id));
+  }, []);
+
+  const handleUpdate = useCallback(async (entry) => {
+    await updateCase(entry);
+    setCases(prev => prev.map(c => c.id === entry.id ? entry : c));
   }, []);
 
   if (loading) return (
@@ -1805,7 +2079,7 @@ export default function App() {
       <div style={{ paddingTop: 16 }}>
         {view === "add" && <AddCaseView onSave={handleSave} />}
         {view === "progress" && <ProgressView cases={cases} />}
-        {view === "cases" && <CasesView cases={cases} onDelete={handleDelete} />}
+        {view === "cases" && <CasesView cases={cases} onDelete={handleDelete} onEdit={handleUpdate} />}
       </div>
 
       {/* Bottom nav */}
