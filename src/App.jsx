@@ -886,39 +886,83 @@ function GefaessTagPicker({ sp, tags, onToggle, search }) {
                     <div key={grp.id} style={{ marginBottom: 3 }}>
                       {/* Level 2: Numbered item */}
                       {grp.selectable !== false ? (
-                        // SELECTABLE GROUP — single checkbox for the whole group
-                        <div style={{ display: "flex", gap: 6, alignItems: "stretch" }}>
-                          <button onClick={() => onToggle(grp.id)} style={{
-                            width: 36, flexShrink: 0, borderRadius: 8,
-                            border: `1.5px solid ${selected ? color : DS.border}`,
-                            background: selected ? color + "15" : DS.surface2,
-                            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                            transition: "all 0.12s",
-                          }}>
-                            <span style={{ width: 16, height: 16, borderRadius: 4,
-                              border: `2px solid ${selected ? color : DS.border2}`,
-                              background: selected ? color : "transparent",
-                              display: "flex", alignItems: "center", justifyContent: "center",
-                              fontSize: 9, color: "#fff" }}>{selected ? "✓" : ""}</span>
-                          </button>
-                          <button onClick={() => hasSubs && setOpenGrp(isGrpOpen ? null : grp.id)} style={{
-                            flex: 1, padding: "9px 10px", borderRadius: 8,
-                            border: `1px solid ${isGrpOpen ? color + "40" : DS.border2}`,
-                            background: isGrpOpen ? color + "0a" : DS.surface2,
-                            color: DS.text, cursor: hasSubs ? "pointer" : "default",
-                            textAlign: "left", display: "flex", justifyContent: "space-between",
-                            alignItems: "baseline", transition: "all 0.12s",
-                          }}>
-                            <div style={{ flex: 1 }}>
-                              <span style={{ fontSize: 12, fontWeight: 600 }}>{grp.label}</span>
+                        // SELECTABLE GROUP — checkbox + label, descOnly subs shown inline
+                        <div>
+                          <div style={{ display: "flex", gap: 6, alignItems: "stretch" }}>
+                            <button onClick={() => onToggle(grp.id)} style={{
+                              width: 36, flexShrink: 0, borderRadius: 8,
+                              border: `1.5px solid ${selected ? color : DS.border}`,
+                              background: selected ? color + "15" : DS.surface2,
+                              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                              transition: "all 0.12s",
+                            }}>
+                              <span style={{ width: 16, height: 16, borderRadius: 4,
+                                border: `2px solid ${selected ? color : DS.border2}`,
+                                background: selected ? color : "transparent",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                fontSize: 9, color: "#fff" }}>{selected ? "✓" : ""}</span>
+                            </button>
+                            <div style={{
+                              flex: 1, padding: "9px 10px", borderRadius: 8,
+                              border: `1px solid ${selected ? color + "40" : DS.border2}`,
+                              background: selected ? color + "0a" : DS.surface2,
+                            }}>
+                              <span style={{ fontSize: 12, fontWeight: 600, color: DS.text }}>{grp.label}</span>
                               {grp.note && <div style={{ fontSize: 10, color: DS.textDim, marginTop: 2 }}>{grp.note}</div>}
                               <div style={{ display: "flex", gap: 8, marginTop: 3 }}>
                                 {grp.minO > 0 && <span style={{ fontSize: 10, color: "#16a34a", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>O:{grp.minO}</span>}
                                 {grp.minA > 0 && <span style={{ fontSize: 10, color: "#2563eb", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>A:{grp.minA}</span>}
                               </div>
+                              {/* descOnly subs shown inline as a simple list */}
+                              {hasSubs && grp.subs.every(s => s.descOnly) && (
+                                <div style={{ marginTop: 6, paddingTop: 5, borderTop: `1px solid ${DS.border}` }}>
+                                  {grp.subs.map(sub => (
+                                    <div key={sub.id} style={{ fontSize: 11, color: DS.textMuted, lineHeight: 1.5 }}>
+                                      {sub.label}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
-                            {hasSubs && <span style={{ color: DS.textDim, fontSize: 11, flexShrink: 0, marginLeft: 8 }}>{isGrpOpen ? "▾" : "▸"}</span>}
-                          </button>
+                          </div>
+                          {/* Mixed subs: some selectable — show those with checkboxes below */}
+                          {hasSubs && !grp.subs.every(s => s.descOnly) && (
+                            <div style={{ paddingLeft: 46, paddingTop: 4, paddingBottom: 2 }}>
+                              {grp.subs.map(sub => {
+                                if (sub.descOnly) {
+                                  return (
+                                    <div key={sub.id} style={{
+                                      padding: "5px 8px", marginBottom: 2, borderRadius: 6,
+                                      background: DS.surface2, border: `1px solid ${DS.border}`,
+                                      fontSize: 12, color: DS.textMuted,
+                                    }}>{sub.label}</div>
+                                  );
+                                }
+                                const subSelected = tags.includes(sub.id);
+                                return (
+                                  <button key={sub.id} onClick={() => onToggle(sub.id)} style={{
+                                    display: "flex", alignItems: "baseline", gap: 10,
+                                    width: "100%", textAlign: "left",
+                                    padding: "8px 10px", marginBottom: 3, borderRadius: 8,
+                                    border: `1.5px solid ${subSelected ? color : DS.border}`,
+                                    background: subSelected ? color + "12" : DS.surface,
+                                    color: DS.text, cursor: "pointer", fontSize: 12, transition: "all 0.12s",
+                                  }}>
+                                    <span style={{ width: 15, height: 15, borderRadius: 3, flexShrink: 0,
+                                      border: `2px solid ${subSelected ? color : DS.border2}`,
+                                      background: subSelected ? color : "transparent",
+                                      display: "flex", alignItems: "center", justifyContent: "center",
+                                      fontSize: 8, color: "#fff" }}>{subSelected ? "✓" : ""}</span>
+                                    <span style={{ flex: 1 }}>{sub.label}</span>
+                                    <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                                      {sub.minO > 0 && <span style={{ fontSize: 10, color: "#16a34a", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>O:{sub.minO}</span>}
+                                      {sub.minA > 0 && <span style={{ fontSize: 10, color: "#2563eb", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>A:{sub.minA}</span>}
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       ) : (
                         // NON-SELECTABLE GROUP — header only, sub-items are individually selectable
@@ -941,8 +985,8 @@ function GefaessTagPicker({ sp, tags, onToggle, search }) {
                         </button>
                       )}
 
-                      {/* Level 3 sub-items */}
-                      {isGrpOpen && hasSubs && (
+                      {/* Level 3 sub-items for NON-SELECTABLE groups only */}
+                      {grp.selectable === false && isGrpOpen && hasSubs && (
                         <div style={{ paddingLeft: grp.selectable !== false ? 46 : 12, paddingTop: 4, paddingBottom: 4 }}>
                           {grp.subs.map(sub => {
                             if (sub.descOnly) {
@@ -1281,7 +1325,7 @@ function AddCaseView({ onSave }) {
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Suchen…" style={{ ...inputStyle, marginBottom: 10 }} />
 
-          <div style={{ maxHeight: "38vh", overflowY: "auto", paddingRight: 2 }}>
+          <div style={{ maxHeight: "38vh", overflowY: "auto", paddingRight: 2, touchAction: "pan-y" }}>
             {CATALOG[activeSpec].type === "hierarchical"
               ? <OrthoTagPicker sp={CATALOG[activeSpec]} tags={tags} onToggle={toggleTag} search={search} />
               : CATALOG[activeSpec].type === "gefaess"
@@ -1835,7 +1879,7 @@ function EditSheet({ caseEntry, onSave, onClose }) {
               <input value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Suchen…" style={{ ...inputStyle, marginBottom: 10 }} />
 
-              <div style={{ maxHeight: "35vh", overflowY: "auto" }}>
+              <div style={{ maxHeight: "35vh", overflowY: "auto", touchAction: "pan-y" }}>
                 {CATALOG[activeSpec].type === "hierarchical"
                   ? <OrthoTagPicker sp={CATALOG[activeSpec]} tags={tags} onToggle={toggleTag} search={search} />
                   : CATALOG[activeSpec].type === "gefaess"
@@ -1869,12 +1913,101 @@ function EditSheet({ caseEntry, onSave, onClose }) {
   );
 }
 
+
+// ─── SWIPEABLE CARD ───────────────────────────────────────────────────────────
+
+function SwipeableCard({ c, onEdit, onDelete }) {
+  const [swiped, setSwiped] = useState(false);
+  const startX = useRef(null);
+
+  const handleTouchStart = (e) => {
+    startX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (startX.current === null) return;
+    const dx = e.changedTouches[0].clientX - startX.current;
+    startX.current = null;
+    if (dx < -50) setSwiped(true);
+    else if (dx > 20) setSwiped(false);
+  };
+
+  return (
+    <div style={{ position: "relative", marginBottom: 8, borderRadius: 12, overflow: "hidden" }}>
+      {/* Action buttons behind the card */}
+      <div style={{
+        position: "absolute", right: 0, top: 0, bottom: 0,
+        display: "flex", alignItems: "stretch",
+      }}>
+        <button onClick={() => { setSwiped(false); onEdit(c); }} style={{
+          background: "#2563eb", border: "none", cursor: "pointer",
+          padding: "0 20px", color: "#fff", fontSize: 13, fontWeight: 700,
+        }}>✎ Edit</button>
+        <button onClick={() => { setSwiped(false); onDelete(c.id); }} style={{
+          background: "#dc2626", border: "none", cursor: "pointer",
+          padding: "0 16px", color: "#fff", fontSize: 18,
+        }}>×</button>
+      </div>
+
+      {/* Card */}
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onClick={() => swiped && setSwiped(false)}
+        style={{
+          background: DS.surface, border: `1px solid ${DS.border}`,
+          borderRadius: 12, padding: "13px 14px",
+          transform: swiped ? "translateX(-116px)" : "translateX(0)",
+          transition: "transform 0.2s ease",
+          position: "relative", zIndex: 1,
+          userSelect: "none",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 14, fontWeight: 700, color: DS.text, fontFamily: "ui-monospace, monospace" }}>
+              {c.fallnr || "—"}
+            </span>
+            <span style={{ fontSize: 12, color: DS.textMuted }}>{formatDate(c.date)}</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <RolePill role={c.role} />
+            <button onClick={e => { e.stopPropagation(); onEdit(c); }} title="Bearbeiten" style={{
+              background: "none", border: "none", color: DS.textMuted,
+              cursor: "pointer", fontSize: 14, padding: "2px 4px", lineHeight: 1,
+            }}>✎</button>
+            <button onClick={e => { e.stopPropagation(); onDelete(c.id); }} style={{
+              background: "none", border: "none", color: DS.textDim,
+              cursor: "pointer", fontSize: 18, padding: "0 2px", lineHeight: 1,
+            }}>×</button>
+          </div>
+        </div>
+        {c.note && <div style={{ fontSize: 12, color: DS.textMuted, marginBottom: 7 }}>{c.note}</div>}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+          {c.tags.map(t => {
+            const item = ALL_ITEMS[t];
+            if (!item) return null;
+            const color = CATALOG[item.specialty]?.color || "#60a5fa";
+            return (
+              <span key={t} style={{
+                fontSize: 10, padding: "3px 8px", borderRadius: 6,
+                background: color + "18", color, border: `1px solid ${color}30`,
+                lineHeight: 1.4
+              }}>{item.label}</span>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── CASES VIEW ───────────────────────────────────────────────────────────────
 
 function CasesView({ cases, onDelete, onEdit }) {
   const [filter, setFilter] = useState("");
   const [editingCase, setEditingCase] = useState(null);
-  const [swipedId, setSwipedId] = useState(null);
+
   const sorted = useMemo(() => [...cases].sort((a, b) => b.date.localeCompare(a.date)), [cases]);
   const filtered = useMemo(() => {
     if (!filter) return sorted;
@@ -1921,90 +2054,14 @@ function CasesView({ cases, onDelete, onEdit }) {
           Noch keine Eingriffe erfasst
         </div>
       )}
-      {filtered.map(c => {
-        const isSwiped = swipedId === c.id;
-        return (
-          <div key={c.id} style={{ position: "relative", marginBottom: 8, borderRadius: 12, overflow: "hidden" }}>
-            {/* Action buttons revealed on swipe */}
-            <div style={{
-              position: "absolute", right: 0, top: 0, bottom: 0,
-              display: "flex", alignItems: "stretch",
-              opacity: isSwiped ? 1 : 0,
-              transition: "opacity 0.15s",
-              pointerEvents: isSwiped ? "auto" : "none",
-            }}>
-              <button onClick={() => { setSwipedId(null); setEditingCase(c); }} style={{
-                background: "#2563eb", border: "none", cursor: "pointer",
-                padding: "0 18px", color: "#fff", fontSize: 13, fontWeight: 700,
-              }}>✎ Edit</button>
-              <button onClick={() => { setSwipedId(null); onDelete(c.id); }} style={{
-                background: "#dc2626", border: "none", cursor: "pointer",
-                padding: "0 14px", color: "#fff", fontSize: 18,
-              }}>×</button>
-            </div>
-
-            {/* Card — slides left on swipe */}
-            <div
-              style={{
-                background: DS.surface, border: `1px solid ${DS.border}`,
-                borderRadius: 12, padding: "13px 14px",
-                transform: isSwiped ? "translateX(-110px)" : "translateX(0)",
-                transition: "transform 0.2s ease",
-                position: "relative", zIndex: 1,
-                cursor: "pointer",
-              }}
-              onTouchStart={e => { e._startX = e.touches[0].clientX; }}
-              onTouchEnd={e => {
-                const dx = e.changedTouches[0].clientX - (e._startX || 0);
-                if (dx < -50) { setSwipedId(c.id); }
-                else if (dx > 20) { setSwipedId(null); }
-              }}
-              onClick={() => { if (isSwiped) { setSwipedId(null); } }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: DS.text, fontFamily: "ui-monospace, monospace" }}>
-                    {c.fallnr || "—"}
-                  </span>
-                  <span style={{ fontSize: 12, color: DS.textMuted }}>{formatDate(c.date)}</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <RolePill role={c.role} />
-                  {/* Edit icon for non-touch */}
-                  <button
-                    onClick={e => { e.stopPropagation(); setEditingCase(c); }}
-                    title="Bearbeiten"
-                    style={{
-                      background: "none", border: "none", color: DS.textDim,
-                      cursor: "pointer", fontSize: 14, padding: "0 2px", lineHeight: 1,
-                    }}>✎</button>
-                  <button
-                    onClick={e => { e.stopPropagation(); onDelete(c.id); }}
-                    style={{
-                      background: "none", border: "none", color: DS.textDim,
-                      cursor: "pointer", fontSize: 18, padding: "0 2px", lineHeight: 1
-                    }}>×</button>
-                </div>
-              </div>
-              {c.note && <div style={{ fontSize: 12, color: DS.textMuted, marginBottom: 7 }}>{c.note}</div>}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                {c.tags.map(t => {
-                  const item = ALL_ITEMS[t];
-                  if (!item) return null;
-                  const color = CATALOG[item.specialty]?.color || "#60a5fa";
-                  return (
-                    <span key={t} style={{
-                      fontSize: 10, padding: "3px 8px", borderRadius: 6,
-                      background: color + "18", color, border: `1px solid ${color}30`,
-                      lineHeight: 1.4
-                    }}>{item.label}</span>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        );
-      })}
+      {filtered.map(c => (
+        <SwipeableCard
+          key={c.id}
+          c={c}
+          onEdit={setEditingCase}
+          onDelete={onDelete}
+        />
+      ))}
 
       {/* Edit sheet */}
       {editingCase && (
