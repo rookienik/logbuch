@@ -360,13 +360,9 @@ const CATALOG = {
               { id: "gf_10e", label: "e – Behandlung traumatischer Venenläsionen", descOnly: true },
             ]
           },
-          { id: "gf_11", label: "11 – Varizenchirurgie", minO: 60, minA: 20, selectable: false,
+          { id: "gf_11", label: "11 – Varizenchirurgie", minO: 60, minA: 20, selectable: true,
+            note: "Crossektomie · Varizenkonvolutausräumung · Stripping V. saphena magna/parva · Perforantenunterbrechung · Kombinationen",
             subs: [
-              { id: "gf_11a", label: "a – Crossektomie", descOnly: true },
-              { id: "gf_11b", label: "b – Varizenkonvolutausräumung", descOnly: true },
-              { id: "gf_11c", label: "c – Stripping der V. saphena magna und/oder parva", descOnly: true },
-              { id: "gf_11d", label: "d – Perforantenunterbrechung", descOnly: true },
-              { id: "gf_11e", label: "e – Kombination von a–d", descOnly: true },
               { id: "gf_11f", label: "f – Endovenöse Varizeneingriffe", minO: 10, minA: 0 },
             ]
           },
@@ -1444,9 +1440,15 @@ function ProgressView({ cases }) {
               {sp.type === "gefaess"
                 ? sec.groups.map(grp => {
                   // For non-selectable groups, aggregate counts from selectable subs
+                  // For selectable groups with selectable subs (like 11 Varizen + 11f Endovenös),
+                  // total = group tag + selectable sub tags combined
                   const selectableSubs = (grp.subs || []).filter(s => !s.descOnly);
+                  const grpRaw = counts[grp.id] || { V: 0, I: 0, A: 0 };
                   const rawC = grp.selectable !== false
-                    ? (counts[grp.id] || { V: 0, I: 0, A: 0 })
+                    ? selectableSubs.reduce((acc, sub) => {
+                        const c = counts[sub.id] || { V: 0, I: 0, A: 0 };
+                        return { V: acc.V + c.V, I: acc.I + c.I, A: acc.A + c.A };
+                      }, grpRaw)  // start from group's own count, add selectable subs
                     : selectableSubs.reduce((acc, sub) => {
                         const c = counts[sub.id] || { V: 0, I: 0, A: 0 };
                         return { V: acc.V + c.V, I: acc.I + c.I, A: acc.A + c.A };
