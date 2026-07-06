@@ -291,6 +291,7 @@ const CATALOG = {
       { id: "gf_A", label: "A – Offene Chirurgie der Arterien",
         groups: [
           { id: "gf_1", label: "1 – Chirurgie der supraaortalen Äste", minO: 20, minA: 25, selectable: true,
+            note: "Karotis-TEA/-Eversion · A. carotis communis · A. vertebralis · A. subclavia / Truncus brachiocephalicus",
             subs: [
               { id: "gf_1a", label: "a – Thrombendarterektomie / Eversionsendarterektomie Karotis-Bifurkation", descOnly: true },
               { id: "gf_1b", label: "b – Rekonstruktion der A. carotis communis", descOnly: true },
@@ -298,8 +299,9 @@ const CATALOG = {
               { id: "gf_1d", label: "d – Eingriffe bei symptomatischem Verschluss A. subclavia / Truncus brachiocephalicus", descOnly: true },
             ]
           },
-          { id: "gf_2", label: "2 – Arterielle Durchblutungsstörungen obere Extremitäten **", minO: 10, minA: 10, selectable: true, subs: [] },
+          { id: "gf_2", label: "2 – Arterielle Durchblutungsstörungen obere Extremitäten **", minO: 10, minA: 10, selectable: true, note: "Alle Eingriffe an Arterien der oberen Extremitäten", subs: [] },
           { id: "gf_3", label: "3 – Zugangswegechirurgie für Hämodialyse-Patienten", minO: 20, minA: 10, selectable: true,
+            note: "Radio-cephale Fistel (Cimino-Brescia) · Tabatière · Brachio-cephale Fistel · Kunststoff-/Bioprothese · andere Zugangswege",
             subs: [
               { id: "gf_3a", label: "a – Radio-cephale Fistel (Cimino-Brescia Fistel)", descOnly: true },
               { id: "gf_3b", label: "b – Tabatière", descOnly: true },
@@ -332,7 +334,7 @@ const CATALOG = {
               { id: "gf_6d", label: "d – Popliteo-distaler / cruraler / pedaler Bypass", note: "in situ · reversed · prothetisch mit Cuff", minO: 5, minA: 5 },
             ]
           },
-          { id: "gf_7", label: "7 – Revaskularisation bei akuten arteriellen Verschlüssen **", minO: 20, minA: 20, selectable: true, subs: [] },
+          { id: "gf_7", label: "7 – Revaskularisation bei akuten arteriellen Verschlüssen **", minO: 20, minA: 20, selectable: true, note: "Alle Techniken · offen und endovaskulär", subs: [] },
           { id: "gf_8", label: "8 – Varia", minO: 10, minA: 15, selectable: false,
             subs: [
               { id: "gf_8a", label: "a – Fasziotomie", minO: 5, minA: 5 },
@@ -345,6 +347,7 @@ const CATALOG = {
       { id: "gf_B", label: "B – Chirurgie der Venen",
         groups: [
           { id: "gf_9", label: "9 – Venöse Thrombektomie untere Extremitäten *", minO: 5, minA: 5, selectable: true,
+            note: "Ilio-femorale Thrombektomie · Vieretagenthrombektomie · temporäre AV-Fistel",
             subs: [
               { id: "gf_9a", label: "a – Ilio-femorale Thrombektomie", descOnly: true },
               { id: "gf_9b", label: "b – Vieretagenthrombektomie", descOnly: true },
@@ -352,6 +355,7 @@ const CATALOG = {
             ]
           },
           { id: "gf_10", label: "10 – Rekonstruktive Eingriffe am tiefen Venensystem **", minO: 5, minA: 5, selectable: true,
+            note: "Cross-over Bypass · Klappenrekonstruktion · Transplantation/Transfer klappentragender Venen · Transposition · traumatische Venenläsionen",
             subs: [
               { id: "gf_10a", label: "a – Cross-over Bypass bei Beckenvenensperre (Palma-Esperon / Cockett)", descOnly: true },
               { id: "gf_10b", label: "b – Rekonstruktion von Klappen am tiefen Venensystem", descOnly: true },
@@ -367,6 +371,7 @@ const CATALOG = {
             ]
           },
           { id: "gf_12", label: "12 – Eingriffe bei postthrombotischem Syndrom", minO: 5, minA: 5, selectable: true,
+            note: "Ulcusexzision mit Fasziektomie und plastischer Deckung · endoskopische Perforantenligatur · paratibiale Fasziotomie",
             subs: [
               { id: "gf_12a", label: "a – Ulcusexzision mit Fasziektomie und plastischer Deckung", descOnly: true },
               { id: "gf_12b", label: "b – Endoskopische Ligatur von Vv. Perforantes", descOnly: true },
@@ -378,33 +383,36 @@ const CATALOG = {
       { id: "gf_C", label: "C – Besondere Eingriffe",
         groups: [
           { id: "gf_13", label: "13 – Amputationen", minO: 10, minA: 5, selectable: true,
+            note: "Klein (Zehen, Mittelfuss) · Gross (Unterschenkel / Oberschenkel)",
             subs: [
               { id: "gf_13a", label: "a – Kleine Amputationen (Zehen, Mittelfuss)", descOnly: true },
               { id: "gf_13b", label: "b – Grosse Amputationen (Unterschenkel / Oberschenkel)", descOnly: true },
             ]
           },
           { id: "gf_14", label: "14 – Indirekt hyperämisierende Massnahmen – Sympathektomien", minO: 0, minA: 0, selectable: true,
+            note: "Thorakale · Lumbale Sympathektomie",
             subs: [
               { id: "gf_14a", label: "a – Thorakale Sympathektomie", descOnly: true },
               { id: "gf_14b", label: "b – Lumbale Sympathektomie", descOnly: true },
             ]
           },
           { id: "gf_15", label: "15 – Operationen bei Kompressionssyndromen *", minO: 2, minA: 4, selectable: true,
+            note: "Thoracic outlet syndrome · Entrapment syndrome",
             subs: [
               { id: "gf_15a", label: "a – Thoracic outlet syndrome", descOnly: true },
               { id: "gf_15b", label: "b – Entrapment syndrome", descOnly: true },
             ]
           },
-          { id: "gf_16", label: "16 – Eingriffe bei Angiodysplasie", minO: 0, minA: 0, selectable: true, subs: [] },
-          { id: "gf_17", label: "17 – Operative Behandlung bei Erkrankungen des Lymphabflusses", minO: 0, minA: 0, selectable: true, subs: [] },
+          { id: "gf_16", label: "16 – Eingriffe bei Angiodysplasie", minO: 0, minA: 0, selectable: true, note: "Kongenitale und erworbene AV-Malformationen", subs: [] },
+          { id: "gf_17", label: "17 – Operative Behandlung bei Erkrankungen des Lymphabflusses", minO: 0, minA: 0, selectable: true, note: "Primäre und sekundäre Lymphabflussstörungen", subs: [] },
         ]
       },
       { id: "gf_D", label: "D – Endovaskuläre Eingriffe",
         note: "Auch bei Kombinationseingriffen anrechenbar",
         groups: [
-          { id: "gf_18", label: "18 – Angiographie (arteriell u. venös)", minO: 30, minA: 20, selectable: true, subs: [] },
-          { id: "gf_19", label: "19 – Angioplastie / Stent / Katheterthrombektomie / Lyse / Hybrid-Eingriffe", minO: 30, minA: 20, selectable: true, subs: [] },
-          { id: "gf_20", label: "20 – Stent-Graft in der Aorta", minO: 10, minA: 10, selectable: true, subs: [] },
+          { id: "gf_18", label: "18 – Angiographie (arteriell u. venös)", minO: 30, minA: 20, selectable: true, note: "Konventionelle und digitale Subtraktionsangiographie · arteriell und venös", subs: [] },
+          { id: "gf_19", label: "19 – Angioplastie / Stent / Katheterthrombektomie / Lyse / Hybrid-Eingriffe", minO: 30, minA: 20, selectable: true, note: "PTA · Stent · Stentgraft · Thrombolyse · kombinierte Hybrid-Eingriffe", subs: [] },
+          { id: "gf_20", label: "20 – Stent-Graft in der Aorta", minO: 10, minA: 10, selectable: true, note: "EVAR · TEVAR · thorakale und abdominale Aorta", subs: [] },
         ]
       },
     ]
@@ -903,11 +911,11 @@ function GefaessTagPicker({ sp, tags, onToggle, search }) {
                               border: `1px solid ${selected ? color + "40" : DS.border2}`,
                               background: selected ? color + "0a" : DS.surface2,
                             }}>
-                              <span style={{ fontSize: 12, fontWeight: 600, color: DS.text }}>{grp.label}</span>
-                              {grp.note && <div style={{ fontSize: 10, color: DS.textDim, marginTop: 2 }}>{grp.note}</div>}
+                              <span style={{ fontSize: 13, fontWeight: 700, color: DS.text }}>{grp.label}</span>
+                              {grp.note && <div style={{ fontSize: 11, color: DS.textMuted, marginTop: 3 }}>{grp.note}</div>}
                               <div style={{ display: "flex", gap: 8, marginTop: 3 }}>
-                                {grp.minO > 0 && <span style={{ fontSize: 10, color: "#16a34a", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>O:{grp.minO}</span>}
-                                {grp.minA > 0 && <span style={{ fontSize: 10, color: "#2563eb", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>A:{grp.minA}</span>}
+                                {grp.minO > 0 && <span style={{ fontSize: 11, color: "#16a34a", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>O:{grp.minO}</span>}
+                                {grp.minA > 0 && <span style={{ fontSize: 11, color: "#2563eb", fontFamily: "ui-monospace, monospace", fontWeight: 700 }}>A:{grp.minA}</span>}
                               </div>
                               {/* descOnly subs shown inline as a simple list */}
                               {hasSubs && grp.subs.every(s => s.descOnly) && (
